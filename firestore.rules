@@ -1,0 +1,17 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /* each signed-in, email-verified user owns exactly their own document */
+    match /users/{uid} {
+      allow create, read, update, delete: if request.auth != null
+                                          && request.auth.uid == uid
+                                          && request.auth.token.email_verified == true;
+    }
+
+    /* everything else is closed */
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

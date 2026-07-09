@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CoinForge Studio — design beautiful challenge coins in minutes</title>
+  <meta name="description" content="Free, open-source challenge-coin designer for laser engraving. Watch a coin come together in the app, then design yours — in the browser or the Windows app.">
+  <meta name="author" content="Hratch Simonyan">
+  <link rel="icon" type="image/png" href="assets/icon.png?v=2">
+  <meta property="og:title" content="CoinForge Studio — beautiful challenge coins, designed in minutes">
+  <meta property="og:description" content="Free & open-source coin designer for laser engraving. Watch the demo, then make yours.">
+  <meta property="og:image" content="https://coinforgestudio.com/assets/demo-poster.jpg">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preload" href="assets/Cinzel-900-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/Cinzel-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <style>
+    :root {
+      --bg0: #0e1116;
+      --bg1: #141922;
+      --bg2: #191f2a;
+      --panel: #1d242f;
+      --line: #2b3340;
+      --line2: #38414f;
+      --text: #e9ecf1;
+      --muted: #9aa4b2;
+      --brass: #d9b544;
+      --brass-hi: #f4dc8a;
+      --brass-dk: #8a6d1f;
+      --maxw: 1140px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      color: var(--text);
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      background:
+        radial-gradient(1100px 620px at 50% -8%, rgba(217, 181, 68, 0.09), transparent 62%),
+        radial-gradient(900px 700px at 88% 28%, rgba(120, 90, 20, 0.07), transparent 60%),
+        radial-gradient(800px 600px at 8% 60%, rgba(60, 70, 100, 0.10), transparent 55%),
+        linear-gradient(180deg, #10141b 0%, var(--bg0) 34%, #0d1015 100%);
+    }
+    @font-face { font-family: 'Cinzel'; src: url('assets/Cinzel-700-normal.woff2') format('woff2'); font-weight: 700; font-display: swap; }
+    @font-face { font-family: 'Cinzel'; src: url('assets/Cinzel-900-normal.woff2') format('woff2'); font-weight: 900; font-display: swap; }
+    .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+
+    /* ---------- nav ---------- */
+    nav { display: flex; align-items: center; gap: 26px; padding: 20px 0; }
+    .brand { display: flex; align-items: center; gap: 10px; font-family: 'Cinzel', serif; font-weight: 900; font-size: 20px; color: var(--brass); text-decoration: none; }
+    .brand img { width: 34px; height: 34px; }
+    .brand small { font-weight: 400; font-size: 11px; letter-spacing: 3px; color: var(--muted); }
+    nav .links { margin-left: auto; display: flex; gap: 24px; align-items: center; }
+    nav a { color: var(--muted); text-decoration: none; font-size: 14.5px; }
+    nav a:hover { color: var(--text); }
+    nav a.heart:hover { color: #ff8b8b; }
+
+    /* ---------- buttons ---------- */
+    .btn {
+      display: inline-flex; align-items: center; gap: 9px;
+      padding: 14px 30px; border-radius: 12px;
+      font-size: 16px; font-weight: 700; text-decoration: none;
+      border: 1px solid var(--line2); color: var(--text);
+      background: rgba(255, 255, 255, 0.02);
+      transition: transform .13s ease, box-shadow .13s ease, border-color .13s ease;
+    }
+    .btn:hover { transform: translateY(-2px); border-color: var(--brass-dk); }
+    .btn.primary {
+      background: linear-gradient(180deg, var(--brass-hi), var(--brass) 52%, #bd9927);
+      color: #251d07; border: none;
+      box-shadow: 0 10px 34px rgba(217, 181, 68, 0.32), inset 0 1px 0 rgba(255,255,255,0.5);
+    }
+    .btn.primary:hover { box-shadow: 0 16px 44px rgba(217, 181, 68, 0.45), inset 0 1px 0 rgba(255,255,255,0.5); }
+    .btn.small { padding: 9px 18px; font-size: 14px; border-radius: 9px; }
+
+    /* ---------- hero ---------- */
+    .hero { text-align: center; padding: 48px 0 20px; }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-size: 10.5px; font-weight: 700; letter-spacing: 2px;
+      color: #6fd39a; text-transform: uppercase;
+      border: 1px solid rgba(88, 201, 138, 0.35);
+      background: rgba(88, 201, 138, 0.07);
+      padding: 5px 13px; border-radius: 30px;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-family: 'Cinzel', serif; font-weight: 900;
+      font-size: clamp(34px, 5vw, 60px);
+      line-height: 1.12; letter-spacing: 0.4px;
+      color: #f6f0e0;
+      max-width: 17em; margin: 0 auto;
+    }
+    .hero h1 em { font-style: normal; color: var(--brass); }
+    .hero p.lead {
+      margin: 22px auto 32px; font-size: 18px; color: var(--muted); max-width: 42em;
+    }
+    .cta-row { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+    .proof { margin: 24px 0 0; display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 13px; color: var(--muted); justify-content: center; }
+    .proof span::before { content: '✓ '; color: var(--brass); }
+
+    /* ---------- the demo video ---------- */
+    .demo-outer { position: relative; padding: 44px 0 30px; }
+    .demo-outer::before {
+      content: '';
+      position: absolute; left: 50%; top: 55%;
+      width: min(1200px, 100vw); height: 70%;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(closest-side, rgba(217, 181, 68, 0.13), transparent 70%);
+      pointer-events: none;
+    }
+    .browser {
+      position: relative;
+      max-width: 1060px; margin: 0 auto;
+      border-radius: 14px;
+      background: #232a36;
+      border: 1px solid var(--line2);
+      box-shadow: 0 40px 110px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255,255,255,0.03) inset;
+      overflow: hidden;
+    }
+    .browser-bar {
+      display: flex; align-items: center; gap: 10px;
+      padding: 11px 16px;
+      background: linear-gradient(#2a3240, #242b37);
+      border-bottom: 1px solid var(--line);
+    }
+    .traffic { display: flex; gap: 7px; }
+    .traffic i { width: 12px; height: 12px; border-radius: 50%; display: block; }
+    .traffic i:nth-child(1) { background: #ff5f57; }
+    .traffic i:nth-child(2) { background: #febc2e; }
+    .traffic i:nth-child(3) { background: #28c840; }
+    .urlbar {
+      flex: 1; max-width: 420px; margin: 0 auto;
+      background: #1a202a; border: 1px solid var(--line);
+      border-radius: 7px; padding: 5px 14px;
+      font-size: 12.5px; color: var(--muted); text-align: center;
+      display: flex; align-items: center; justify-content: center; gap: 7px;
+    }
+    .urlbar .lock { color: #58c98a; font-size: 11px; }
+    .browser video { display: block; width: 100%; height: auto; background: #15181d; cursor: pointer; }
+    .vid-hint {
+      position: absolute; right: 14px; bottom: 14px;
+      background: rgba(16, 19, 25, 0.82);
+      border: 1px solid var(--line2);
+      color: var(--muted); font-size: 12px;
+      padding: 6px 12px; border-radius: 18px;
+      opacity: 0; transition: opacity 0.2s ease;
+      pointer-events: none;
+    }
+    .browser:hover .vid-hint { opacity: 1; }
+    .demo-caption { text-align: center; margin-top: 18px; font-size: 13px; color: var(--muted); }
+    .demo-caption b { color: var(--brass); font-weight: 600; }
+
+    /* ---------- template belt ---------- */
+    .beltsec { padding: 56px 0 60px; }
+    h2.sec { font-family: 'Cinzel', serif; font-weight: 700; font-size: clamp(24px, 3vw, 34px); color: #f6f0e0; text-align: center; margin-bottom: 14px; }
+    p.sec-sub { text-align: center; color: var(--muted); max-width: 46em; margin: 0 auto 42px; }
+    .belt {
+      overflow: hidden;
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+      mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+      padding: 12px 0;
+    }
+    .belt-track { display: flex; gap: 22px; width: max-content; animation: beltmove 60s linear infinite; }
+    .belt:hover .belt-track { animation-play-state: paused; }
+    @keyframes beltmove { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    .belt-coin {
+      width: 165px; height: 165px; border-radius: 50%;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.55), inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+      flex-shrink: 0;
+      transition: transform 0.2s ease;
+    }
+    .belt-coin:hover { transform: scale(1.08) rotate(3deg); }
+
+    /* ---------- sections ---------- */
+    section { padding: 72px 0; }
+    section.alt {
+      background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0)) , var(--bg1);
+      border-top: 1px solid rgba(255,255,255,0.04);
+      border-bottom: 1px solid rgba(0,0,0,0.25);
+    }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0)), var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 15px; padding: 14px 14px 22px;
+      transition: transform .15s ease, border-color .15s ease;
+    }
+    .card:hover { transform: translateY(-3px); border-color: var(--brass-dk); }
+    .card video {
+      display: block; width: 100%; aspect-ratio: 16 / 10;
+      object-fit: cover; border-radius: 10px;
+      border: 1px solid var(--line);
+      background: #141922;
+    }
+    .card h3 { margin: 16px 6px 8px; font-size: 16.5px; }
+    .card p { font-size: 14px; color: var(--muted); margin: 0 6px; }
+
+    /* drifting gold dust (behind everything) */
+    #dust { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; counter-reset: step; }
+    .step { text-align: center; padding: 10px 18px; }
+    .step::before {
+      counter-increment: step; content: counter(step);
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 46px; height: 46px; border-radius: 50%;
+      background: linear-gradient(180deg, var(--brass-hi), var(--brass));
+      color: #251d07; font-weight: 800; font-size: 19px; font-family: 'Cinzel', serif;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 22px rgba(217, 181, 68, 0.25);
+    }
+    .step h3 { font-size: 17px; margin-bottom: 6px; }
+    .step p { font-size: 14px; color: var(--muted); }
+
+    /* ---------- support / open source ---------- */
+    .support-box {
+      display: grid; grid-template-columns: 1.25fr 1fr; gap: 40px; align-items: center;
+      background:
+        radial-gradient(600px 300px at 12% 0%, rgba(217, 181, 68, 0.08), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0)), var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 20px; padding: 46px 48px;
+    }
+    .support-box h3 { font-family: 'Cinzel', serif; font-size: clamp(20px, 2.4vw, 27px); color: #f6f0e0; margin-bottom: 12px; line-height: 1.3; }
+    .support-box p { color: var(--muted); font-size: 15px; margin-bottom: 10px; }
+    .support-box p b { color: var(--text); font-weight: 600; }
+    .support-actions { display: flex; flex-direction: column; gap: 12px; }
+    .btn.coffee {
+      background: linear-gradient(180deg, #ffe9b3, #f5c85c 55%, #dfae37);
+      color: #2a2008; border: none; justify-content: center;
+      box-shadow: 0 10px 30px rgba(217, 181, 68, 0.25);
+    }
+    .btn.ghosty { justify-content: center; }
+    .support-note { font-size: 12px; color: var(--muted); text-align: center; }
+
+    footer { padding: 46px 0 62px; border-top: 1px solid var(--line); text-align: center; color: var(--muted); font-size: 13.5px; }
+    footer a { color: var(--brass); text-decoration: none; }
+    footer .foot-links { margin-top: 10px; display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+    footer .foot-links a { color: var(--muted); }
+    footer .foot-links a:hover { color: var(--text); }
+
+    @media (max-width: 880px) {
+      .grid, .steps { grid-template-columns: 1fr; }
+      .support-box { grid-template-columns: 1fr; padding: 34px 26px; }
+      nav .links a:not(.btn) { display: none; }
+      .hero { padding-top: 26px; }
+      .urlbar { max-width: 200px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .belt-track { animation: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wrap">
+    <nav>
+      <a class="brand" href="#"><img src="assets/icon.png?v=2" alt=""> CoinForge <small>STUDIO</small></a>
+      <div class="links">
+        <a href="#features">Features</a>
+        <a href="#workflow">Workflow</a>
+        <a href="https://github.com/hratchyan/coinforgestudio">GitHub</a>
+        <a class="heart" href="#support" title="Support the project">♥</a>
+        <a class="btn primary small" href="https://app.coinforgestudio.com">Launch App</a>
+      </div>
+    </nav>
+  </div>
+
+  <header class="wrap hero">
+    <div class="eyebrow">✦ &nbsp;Free & Open Source</div>
+    <h1>Beautiful challenge coins.<br><em>Designed in minutes.</em></h1>
+    <p class="lead">
+      A coin designer built for laser engraving — curated rings, coin-true arc text,
+      AI photo import, and files that drop into your laser software at the exact size.
+      Watch one come together:
+    </p>
+    <div class="cta-row">
+      <a class="btn primary" href="https://app.coinforgestudio.com">▶&nbsp; Try it free</a>
+      <a class="btn" href="https://github.com/hratchyan/coinforgestudio/releases">⬇&nbsp; Download for Windows</a>
+    </div>
+    <div class="proof">
+      <span>No account needed on desktop</span>
+      <span>Open source (MIT)</span>
+      <span>Runs in your browser</span>
+      <span>Nothing uploaded — AI runs locally</span>
+    </div>
+  </header>
+
+  <div class="demo-outer">
+    <div class="wrap">
+      <div class="browser">
+        <div class="browser-bar">
+          <div class="traffic"><i></i><i></i><i></i></div>
+          <div class="urlbar"><span class="lock">🔒</span> app.coinforgestudio.com</div>
+          <div style="width:54px"></div>
+        </div>
+        <video id="demo" autoplay muted loop playsinline preload="metadata"
+               poster="assets/demo-poster.jpg" src="assets/demo.mp4"
+               aria-label="Timelapse of a challenge coin being designed in CoinForge Studio"></video>
+        <div class="vid-hint" id="vid-hint">click to pause</div>
+      </div>
+      <p class="demo-caption">Real app, real time — a full coin in <b>under 30 seconds</b>. Every step you just watched is one click.</p>
+    </div>
+  </div>
+
+  <div class="beltsec">
+    <div class="wrap">
+      <h2 class="sec">Or start from something finished</h2>
+      <p class="sec-sub">16 complete templates, 90+ curated symbols, 13 ring presets — pick one, make it yours.</p>
+    </div>
+    <div class="belt"><div class="belt-track" id="belt"></div></div>
+  </div>
+
+  <section class="alt" id="features">
+    <div class="wrap">
+      <h2 class="sec">Everything a coin needs</h2>
+      <p class="sec-sub">Purpose-built tools instead of wrestling a general-purpose vector editor.</p>
+      <div class="grid">
+        <div class="card"><video muted loop playsinline preload="metadata" src="assets/feat/rings.mp4" aria-label="Ring presets cycling on a coin"></video><h3>Ring designer</h3>
+          <p>One-click curated frames — star circles, rope, beaded, reeded mint edge, chains, laurel wreaths, knockout-star military bands. Every part stays editable.</p></div>
+        <div class="card"><video muted loop playsinline preload="metadata" src="assets/feat/arctext.mp4" aria-label="Arc text typing around a coin"></video><h3>Coin-true arc text</h3>
+          <p>Top and bottom text that behaves like real coinage — upright both sides, baseline-true radii, justify-across-arc, bare-metal knockouts on marked bands.</p></div>
+        <div class="card"><video muted loop playsinline preload="metadata" src="assets/feat/photo.mp4" aria-label="AI background removal in the studio"></video><h3>Smart photo import</h3>
+          <p>Paste a screenshot or drop a photo. AI background removal runs locally — nothing is uploaded — then your subject lands centered and sized.</p></div>
+        <div class="card"><video muted loop playsinline preload="metadata" src="assets/feat/symbols.mp4" aria-label="Scrolling the symbol library"></video><h3>Templates & symbols</h3>
+          <p>16 complete coin layouts and 90+ curated vector symbols — badges, wreaths, maltese crosses, anchors, compasses — plus hundreds of ornament glyphs.</p></div>
+        <div class="card"><video muted loop playsinline preload="metadata" src="assets/feat/export.mp4" aria-label="Export dialog with per-group files and dithering"></video><h3>Multi-pass export</h3>
+          <p>Group elements into engraving passes, export one aligned file per pass or a color-mapped SVG your laser software auto-splits. PNG at exact DPI.</p></div>
+        <div class="card"><video muted loop playsinline preload="metadata" src="assets/feat/outline.mp4" aria-label="Cut outline growing around a design"></video><h3>Cut outline generator</h3>
+          <p>One click traces a smooth vector silhouette around your whole design — even when the art has no continuous edge — ready for the cutting layer.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="workflow">
+    <div class="wrap">
+      <h2 class="sec">Three steps to a coin</h2>
+      <p class="sec-sub"></p>
+      <div class="steps">
+        <div class="step"><h3>Design</h3><p>Start from a template or a blank. Add rings, text, symbols — or paste a photo and let Smart Import do the cutout.</p></div>
+        <div class="step"><h3>Export</h3><p>PNG at 1016 DPI (0.025&nbsp;mm/px), dithered or grayscale, sized exactly to your blank. SVG for vector workflows.</p></div>
+        <div class="step"><h3>Engrave</h3><p>Import into LightBurn, WeCreat MakeIt, or any laser software — don't rescale — and burn. The built-in guide covers settings.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="alt" id="support">
+    <div class="wrap">
+      <div class="support-box">
+        <div>
+          <h3>Free forever. Fueled by coffee.</h3>
+          <p>
+            Hi — I'm <b>Hratch</b>. I build CoinForge nights and weekends because I make coins too,
+            and the tool I wanted didn't exist. It's open source, has no ads, no tracking,
+            and no paywalls — and it stays that way.
+          </p>
+          <p>
+            If it saved you an evening of fighting a vector editor, a coffee keeps the forge hot.
+            And if you're saving your coffee money — <b>a GitHub star</b> helps other makers find it,
+            and that's worth just as much.
+          </p>
+        </div>
+        <div class="support-actions">
+          <!-- swap SUPPORT_URL when the Ko-fi / BuyMeACoffee handle is claimed -->
+          <a class="btn coffee" id="support-btn" href="https://ko-fi.com/hratchyan">☕&nbsp; Buy me a coffee</a>
+          <a class="btn ghosty" href="https://github.com/hratchyan/coinforgestudio">★&nbsp; Star on GitHub — free</a>
+          <div class="support-note">Either one genuinely helps. Thank you. 🪙</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <div>Built by <a href="https://github.com/hratchyan">Hratch Simonyan</a> — a maker, for makers. 🪙</div>
+      <div class="foot-links">
+        <a href="https://github.com/hratchyan/coinforgestudio">GitHub</a>
+        <a href="https://github.com/hratchyan/coinforgestudio/releases">Downloads</a>
+        <a href="https://github.com/hratchyan/coinforgestudio/blob/main/docs/USER_GUIDE.md">User Guide</a>
+        <a href="https://github.com/hratchyan/coinforgestudio/blob/main/docs/LASER_WORKFLOW.md">Laser Workflow</a>
+        <a href="https://github.com/hratchyan/coinforgestudio/blob/main/LICENSE">MIT License</a>
+      </div>
+    </div>
+  </footer>
+
+  <canvas id="dust" aria-hidden="true"></canvas>
+
+  <script>
+    /* drifting gold dust — barely-there, battery-aware */
+    (function () {
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      const c = document.getElementById('dust');
+      const x = c.getContext('2d');
+      let W, H, motes;
+      function size() {
+        W = c.width = innerWidth;
+        H = c.height = innerHeight;
+        const n = Math.round(Math.min(90, W * H / 26000));
+        motes = Array.from({ length: n }, () => ({
+          px: Math.random() * W, py: Math.random() * H,
+          r: 0.5 + Math.random() * 1.3,
+          a: 0.03 + Math.random() * 0.11,
+          vy: 0.06 + Math.random() * 0.16,
+          ph: Math.random() * Math.PI * 2,
+          sw: 0.15 + Math.random() * 0.35,
+        }));
+      }
+      size();
+      addEventListener('resize', size);
+      let t = 0;
+      (function tick() {
+        requestAnimationFrame(tick);
+        if (document.hidden) return;
+        t += 0.016;
+        x.clearRect(0, 0, W, H);
+        for (const m of motes) {
+          m.py -= m.vy;
+          if (m.py < -4) { m.py = H + 4; m.px = Math.random() * W; }
+          const dx = Math.sin(t * m.sw + m.ph) * 14;
+          const tw = 0.75 + 0.25 * Math.sin(t * 1.7 + m.ph * 3);
+          x.beginPath();
+          x.arc(m.px + dx, m.py, m.r, 0, 6.3);
+          x.fillStyle = 'rgba(226, 195, 110,' + (m.a * tw) + ')';
+          x.fill();
+        }
+      })();
+    })();
+
+    /* feature clips: play only while on screen */
+    (function () {
+      const vids = document.querySelectorAll('.card video');
+      const io = new IntersectionObserver(es => {
+        for (const e of es) {
+          const v = e.target;
+          if (e.isIntersecting) { v.play().catch(() => {}); }
+          else v.pause();
+        }
+      }, { threshold: 0.25 });
+      vids.forEach(v => io.observe(v));
+    })();
+
+    /* static template belt (duplicated for seamless loop) */
+    (function () {
+      const belt = document.getElementById('belt');
+      const names = ['Veteran Eagle','Police','Family Crest','Liberty','Fire Dept','Anniversary','Graduation','Military Band','Memorial','Sports Club','Corporate','Minimal'];
+      let html = '';
+      for (let r = 0; r < 2; r++)
+        for (let i = 0; i < 12; i++)
+          html += '<img class="belt-coin" loading="lazy" src="assets/tpl/t' + i + '.png" alt="' + names[i] + ' coin template" title="' + names[i] + '">';
+      belt.innerHTML = html;
+    })();
+
+    /* click-to-pause on the demo */
+    (function () {
+      const v = document.getElementById('demo');
+      const hint = document.getElementById('vid-hint');
+      v.addEventListener('click', () => {
+        if (v.paused) { v.play(); hint.textContent = 'click to pause'; }
+        else { v.pause(); hint.textContent = 'click to play'; }
+      });
+    })();
+  </script>
+</body>
+</html>

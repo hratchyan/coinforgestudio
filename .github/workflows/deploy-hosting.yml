@@ -1,0 +1,27 @@
+# Deploys the landing page + web app to Firebase Hosting on every push to main.
+#
+# One-time setup (after the Firebase project exists):
+#   1. Firebase console → Project settings → Service accounts → Generate new private key
+#   2. GitHub repo → Settings → Secrets and variables → Actions →
+#      new secret FIREBASE_SERVICE_ACCOUNT = the JSON file contents
+# (Or run `npx firebase init hosting:github` locally, which automates both.)
+name: Deploy to Firebase Hosting
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'app/**'
+      - 'site/**'
+      - 'firebase.json'
+      - '.firebaserc'
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          channelId: live
+          projectId: coinforgestudio

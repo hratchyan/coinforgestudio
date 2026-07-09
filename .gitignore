@@ -1,0 +1,18 @@
+# build outputs
+dist/
+node_modules/
+*.log
+
+# dev-server scratch
+tools/.snap.png
+
+# OS noise
+Thumbs.db
+Desktop.ini
+.DS_Store
+# firebase
+.firebase/
+firebase-debug.log
+
+tools/.frames/
+tools/.clipframes/
