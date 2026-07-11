@@ -15,7 +15,7 @@ software at the right size, every time.
 
 | Way | How | Notes |
 | --- | --- | --- |
-| **In your browser** | [app.coinforgestudio.com](https://app.coinforgestudio.com) | Nothing to install; free account (Google sign-in). Optional [Pro plan](https://coinforgestudio.com/#pricing) adds cloud slots, the template vault & the AI assistant |
+| **In your browser** | [app.coinforgestudio.com](https://app.coinforgestudio.com) | Nothing to install; free account (Google sign-in) includes 1 cloud project. Optional [Pro plan](https://coinforgestudio.com/#pricing) adds 10 cloud slots & the template vault |
 | **Windows portable** ⭐ | Grab `CoinForgeStudio-Portable.exe` from [Releases](https://github.com/hratchyan/coinforgestudio/releases) | No install, no account, works fully offline — copy it anywhere |
 | **Windows installer** | `CoinForgeStudio-Setup.exe` from [Releases](https://github.com/hratchyan/coinforgestudio/releases) | Start-menu & desktop shortcuts |
 | **From source** | Clone, then `Launch CoinForge (Browser Mode).bat` | Runs the raw files in Edge/Chrome; zero dependencies |
@@ -58,6 +58,9 @@ and never phones home — no account, no telemetry, works with no internet at al
   mode.
 - **Touch-ready** — on phones and tablets the panels become drawers, and the canvas
   gets pinch-zoom and two-finger pan.
+- **AI Assistant (MCP), free** — the desktop app can hand its controls to your own AI
+  (Claude Desktop, Claude Code, or any MCP client), which designs coins in your window
+  while you watch — real elements, real previews, laser-ready export. Tools → AI Assistant.
 
 ## Documentation
 

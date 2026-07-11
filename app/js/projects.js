@@ -9,7 +9,7 @@
    - browser: IndexedDB (gigabyte-class quota — photo projects
      save fine; the old localStorage backend choked at ~5MB and
      is migrated automatically on first run)
-   - hosted + Pro/Elite: cloud slots via cloudprojects.js
+   - hosted: cloud slots via cloudprojects.js (1 free, 10 on Pro)
 
    Local saves are unlimited on every plan. Cloud slots are the
    paid feature and are enforced server-side by security rules.
@@ -180,7 +180,7 @@
     CF.bus.emit('saved');
   }
 
-  /* ---- cloud slot ops (hosted, Pro/Elite — see cloudprojects.js) ---- */
+  /* ---- cloud slot ops (hosted — see cloudprojects.js) ---- */
   async function saveToSlot(slot) {
     const doc = S().doc;
     if (!doc) return false;

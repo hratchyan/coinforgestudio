@@ -1,10 +1,10 @@
 /* ============================================================
    CoinForge Studio — cloudprojects.js
-   Cloud project slots for the HOSTED app (Pro/Elite plans).
+   Cloud project slots for the HOSTED app.
 
    Projects live in numbered SLOTS — like game saves:
-     Pro   → slots 0–2   (3)
-     Elite → slots 0–9   (10)
+     Free → slot 0 (1 cloud project, forever)
+     Pro  → slots 0–9 (10)
    The slot number itself is what security rules validate against
    the plan, so the cap is enforced server-side with no counters.
 
