@@ -21,8 +21,8 @@ service cloud.firestore {
       allow update: if owner() && tierUntouched();
 
       /* ---- cloud project slots (metadata; payloads live in Storage) ----
-         Slot ids are single digits 0-9. Two-tier model: Pro unlocks all
-         10 slots ('elite' accepted as legacy role, same entitlement).
+         Slot ids are single digits 0-9. Free gets slot 0 (one cloud
+         project, forever); Pro unlocks all ten ('elite' = legacy pro).
          The slot id in the path is what rules validate — stateless,
          no counters to race. Reads and deletes work on any slot
          regardless of plan, so a lapsed user never loses their work. */
@@ -31,7 +31,8 @@ service cloud.firestore {
           return ('stripeRole' in request.auth.token) ? request.auth.token.stripeRole : '';
         }
         function slotAllowed() {
-          return slot.matches('[0-9]') && role() in ['pro', 'elite'];
+          return slot == '0'
+              || (slot.matches('[0-9]') && role() in ['pro', 'elite']);
         }
         /* list must be a separate grant: a collection query can't prove
            the doc-id regex, so a combined `read` rule fails closed */
@@ -64,24 +65,6 @@ service cloud.firestore {
       match /payments/{id} {
         allow read: if request.auth != null && request.auth.uid == uid;
       }
-    }
-
-    /* ---- desktop AI link handshake ----
-       A Pro member (signed in on the hosted app) writes a short-lived
-       doc keyed by the unguessable code their desktop app generated.
-       The desktop reads it once (public REST get on the exact code —
-       the code IS the secret; you can't list or guess it) then deletes
-       it. Only pro/elite may create; the doc can only claim its own uid.
-       'get' is allowed (need the exact 10-char id); 'list' is denied. */
-    match /devicelinks/{code} {
-      allow get: if true;
-      allow delete: if true;
-      allow create: if request.auth != null
-                    && request.auth.token.email_verified == true
-                    && request.resource.data.uid == request.auth.uid
-                    && ('stripeRole' in request.auth.token)
-                    && request.auth.token.stripeRole in ['pro', 'elite']
-                    && request.resource.data.role == request.auth.token.stripeRole;
     }
 
     /* public product catalog mirrored from Stripe */

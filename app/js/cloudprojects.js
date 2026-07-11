@@ -18,9 +18,9 @@
    ============================================================ */
 'use strict';
 (function () {
-  /* two-tier model (2026-07-10): Pro gets all 10 slots.
-     'elite' kept as an accepted legacy role — same entitlement. */
-  const SLOTS = { free: 0, pro: 10, elite: 10 };
+  /* two-tier model (2026-07-11): Free gets 1 cloud slot forever, Pro
+     gets all 10. 'elite' kept as an accepted legacy role — same as pro. */
+  const SLOTS = { free: 1, pro: 10, elite: 10 };
   const MAX_SLOT_ID = 9; /* absolute ceiling, matches rules */
 
   const ready = () =>

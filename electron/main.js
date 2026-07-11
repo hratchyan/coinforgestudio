@@ -232,15 +232,9 @@ ipcMain.on('mcp-result', (e, { id, result }) => {
   p.resolve(result);
 });
 
-/* the renderer may only start the server when a valid Pro link exists —
-   it holds the link UI; main re-checks the stored link as a backstop */
-const linkValid = () => {
-  const l = readSettings()['ailink'];
-  return !!(l && (l.role === 'pro' || l.role === 'elite')
-    && (Date.now() - (l.at || 0)) < 1000 * 60 * 60 * 24 * 30);
-};
+/* the AI assistant is a free feature — anyone running the desktop app
+   can start the local server (it binds to 127.0.0.1 with a per-start token) */
 ipcMain.handle('mcp-start', async () => {
-  if (!linkValid()) return { running: false, error: 'not linked' };
   const exportsDir = path.join(PROJECTS_DIR(), 'exports');
   return await mcp.start({
     exec: execInRenderer,

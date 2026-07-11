@@ -25,8 +25,8 @@ service firebase.storage {
       allow write: if owner()
                    && request.resource.size < 20 * 1024 * 1024
                    && request.resource.contentType == 'application/json'
-                   && fname.matches('[0-9]\\.json')
-                   && role() in ['pro', 'elite'];
+                   && (fname == '0.json'
+                       || (fname.matches('[0-9]\\.json') && role() in ['pro', 'elite']));
     }
 
     match /{allPaths=**} {

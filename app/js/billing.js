@@ -23,8 +23,8 @@
      role on old accounts — same entitlement as pro. */
   const PLAN_ORDER = { pro: 0, elite: 0 };
   const PLAN_BLURB = {
-    pro: '10 cloud slots · full & growing template vault · AI assistant (MCP) add-on',
-    elite: '10 cloud slots · full & growing template vault · AI assistant (MCP) add-on',
+    pro: '10 cloud slots (up from 1) · full & growing template & asset vault',
+    elite: '10 cloud slots (up from 1) · full & growing template & asset vault',
   };
 
   const ready = () =>
@@ -156,9 +156,9 @@
       card.appendChild(U.el('p', { class: 'cf-ty-lead' },
         'Thank you for fueling the forge — support like yours is what keeps CoinForge free for everyone else. Here\'s what just unlocked:'));
       const ul = U.el('ul', { class: 'cf-ty-list' });
-      ul.appendChild(U.el('li', null, U.el('b', null, '10 cloud slots'), ' — your coins now follow your account to any device'));
+      ul.appendChild(U.el('li', null, U.el('b', null, '10 cloud slots'), ' — up from 1; your coins follow your account to any device'));
       ul.appendChild(U.el('li', null, 'The full & growing template and asset vault'));
-      ul.appendChild(U.el('li', null, 'AI assistant (MCP) add-on — early access as it rolls out'));
+      ul.appendChild(U.el('li', null, 'You keep the forge lit for everyone else ☕'));
       card.appendChild(ul);
       const row = U.el('div', { class: 'cf-ty-btns' });
       const b1 = U.el('button', { class: 'cf-btn primary' }, '☁ Save this coin to the cloud');
@@ -261,7 +261,7 @@
       return;
     }
     modal.body.appendChild(U.el('p', { class: 'cf-confirm-msg' },
-      'The designer stays free, forever. Pro adds the cloud, the vault, and the AI.'));
+      'Free already includes 1 cloud slot and the AI assistant. Pro adds 9 more cloud slots and the full template & asset vault.'));
     for (const pl of list) {
       const buyBtn = U.el('button', { class: 'cf-btn primary' }, 'Go Pro');
       const priceEl = pl.promoNote

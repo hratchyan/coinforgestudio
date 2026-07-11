@@ -87,15 +87,14 @@ See `CUSTOMIZING.md` — that's the whole point of the plain-JS design.
 ## Plans, accounts & cloud saves
 
 **What's free, and what's paid?**
-The designer is free — every tool, every export, no watermarks, forever. That's true in
-the browser at app.coinforgestudio.com (free account) and in the desktop app (no account
-at all). **Pro** ($59/year) adds the conveniences around the designer: cloud slots, the
-template & asset vault, and the AI assistant add-on.
+Almost everything is free — every design tool, every export, the AI assistant, and
+**1 cloud project** — forever, no watermarks. **Pro** ($59/year) adds just two things:
+**10 cloud slots** (up from 1) and the **template & asset vault**.
 
 **Where do my projects live?**
 - *Desktop app:* real `.coin` files in `Documents\CoinForge Projects`. Yours, offline, forever.
-- *Browser (free):* saved in that browser's own storage — unlimited, but they stay on that
-  device. Export a `.coin` file for a backup you control.
+- *Browser (free):* unlimited local saves in that browser's storage (stay on that device),
+  plus **1 cloud slot** that follows your account. Export a `.coin` file for a backup you control.
 - *Pro cloud slots:* 10 numbered slots that follow your account — save on the desk PC,
   open on the laptop or phone. `File → ☁ Save to cloud` (Ctrl+Shift+S) or the Projects
   dialog (Ctrl+O).
@@ -109,11 +108,14 @@ Annual, through Stripe (we never see your card number). Cancel anytime from your
 menu → *Manage billing* — you keep Pro until the end of the paid period. Every charge has
 a 14-day no-questions money-back window: email contact@coinforgestudio.com.
 
-**What is the AI assistant (MCP) add-on?**
-An optional Pro feature (rolling out) that lets your own AI — Claude Desktop, Claude Code,
-or any MCP-compatible client — design coins with you: it places real elements, sees real
-previews, and hands you laser-ready art. Your AI subscription, your machine, your data.
+**What is the AI assistant (MCP)?**
+A free feature of the desktop app: your own AI — Claude Desktop, Claude Code, or any
+MCP-compatible client — designs coins with you, placing real elements, seeing real
+previews, and handing you laser-ready art. Turn it on in **Tools → AI Assistant (MCP)**;
+no account needed. Your AI subscription, your machine, your data. See the AI Assistant
+guide for setup.
 
 **Does the free version get worse over time?**
-No. The promise is structural: paid features are things *around* the designer (sync,
-content, AI) — never the designer itself. If a tool exists in CoinForge, it works in Free.
+No. The promise is structural: the two paid things are *around* the designer (extra cloud
+storage and content packs) — never the designer, the export quality, or the AI. If a tool
+exists in CoinForge, it works in Free.

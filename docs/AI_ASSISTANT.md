@@ -1,6 +1,6 @@
 # AI Assistant (MCP) — design coins with Claude
 
-*A Pro feature. The desktop app only.*
+*Free. The desktop app only.*
 
 CoinForge can hand a set of controls to your own AI — **Claude Desktop**,
 **Claude Code**, or any app that speaks **MCP** (the Model Context Protocol).
@@ -16,21 +16,13 @@ your machine can reach.
 ## What you need
 
 - The **desktop** CoinForge app (this feature isn't in the browser version).
-- A **Pro** account, linked once (below).
 - An MCP-capable AI client — e.g. Claude Desktop or Claude Code.
+- That's it — no account, no sign-in. It's free.
 
-## One-time setup
+## Setup
 
-### 1. Link your Pro account
-1. In the desktop app: **Tools → AI Assistant (MCP)…** — it shows a short link code.
-2. On **app.coinforgestudio.com**, signed in with your Pro account, open the
-   avatar menu → **Link desktop AI…** and type that code.
-3. The desktop unlocks within a few seconds. (The link lasts 30 days, then just
-   re-link — same steps.)
-
-### 2. Start the assistant server
-In the same dialog, click **Start assistant server**. It shows two ready-made
-config snippets — copy the one for your client:
+In the desktop app: **Tools → AI Assistant (MCP)…**, then click **Start assistant
+server**. It shows two ready-made config snippets — copy the one for your client:
 
 - **Claude Code** — paste the one-line `claude mcp add …` command in a terminal.
 - **Claude Desktop** — add the shown block to your `claude_desktop_config.json`
@@ -75,8 +67,6 @@ connections from web pages.
 
 ## Troubleshooting
 
-- **"Not linked."** Re-do the link steps; make sure you're signed in as Pro on the
-  website and typed the code correctly.
 - **Claude can't connect.** Confirm the server shows *● Running*, and that you
   copied the current token (it changes each start). Restart the server and re-copy.
 - **The coin looks crowded.** Ask the AI to "check fit and tidy it up," or nudge
