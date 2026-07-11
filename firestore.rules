@@ -66,6 +66,24 @@ service cloud.firestore {
       }
     }
 
+    /* ---- desktop AI link handshake ----
+       A Pro member (signed in on the hosted app) writes a short-lived
+       doc keyed by the unguessable code their desktop app generated.
+       The desktop reads it once (public REST get on the exact code —
+       the code IS the secret; you can't list or guess it) then deletes
+       it. Only pro/elite may create; the doc can only claim its own uid.
+       'get' is allowed (need the exact 10-char id); 'list' is denied. */
+    match /devicelinks/{code} {
+      allow get: if true;
+      allow delete: if true;
+      allow create: if request.auth != null
+                    && request.auth.token.email_verified == true
+                    && request.resource.data.uid == request.auth.uid
+                    && ('stripeRole' in request.auth.token)
+                    && request.auth.token.stripeRole in ['pro', 'elite']
+                    && request.resource.data.role == request.auth.token.stripeRole;
+    }
+
     /* public product catalog mirrored from Stripe */
     match /products/{id} {
       allow read: if true;

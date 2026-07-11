@@ -256,6 +256,7 @@
           onClick: () => CF.billing ? CF.billing.upgradeDialog() : window.open('https://coinforgestudio.com/#pricing', '_blank', 'noopener'),
         });
       } else {
+        entries.push({ label: 'Link desktop AI…', onClick: () => CF.assistant && CF.assistant.linkDialog() });
         entries.push({ label: 'Manage billing…', onClick: () => CF.billing && CF.billing.portal() });
       }
       entries.push('-', { label: 'Sign out', onClick: () => auth.signOut().then(() => location.reload()) });

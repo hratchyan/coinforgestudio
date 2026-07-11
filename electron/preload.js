@@ -11,4 +11,13 @@ contextBridge.exposeInMainWorld('native', {
   projectsWrite: (id, json) => ipcRenderer.invoke('projects-write', id, json),
   projectsRemove: (id) => ipcRenderer.invoke('projects-remove', id),
   onMenu: (fn) => ipcRenderer.on('menu', (e, cmd) => fn(cmd)),
+
+  /* AI assistant (MCP) — see electron/mcp-server.js */
+  settingsGet: (key) => ipcRenderer.invoke('settings-get', key),
+  settingsSet: (key, value) => ipcRenderer.invoke('settings-set', key, value),
+  mcpStart: () => ipcRenderer.invoke('mcp-start'),
+  mcpStop: () => ipcRenderer.invoke('mcp-stop'),
+  mcpStatus: () => ipcRenderer.invoke('mcp-status'),
+  onMcpExec: (fn) => ipcRenderer.on('mcp-exec', (e, payload) => fn(payload)),
+  mcpResult: (id, result) => ipcRenderer.send('mcp-result', { id, result }),
 });

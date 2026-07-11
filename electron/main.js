@@ -6,6 +6,7 @@
 const { app, BrowserWindow, Menu, ipcMain, dialog, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const mcp = require('./mcp-server.js');
 
 let win = null;
 
@@ -79,6 +80,8 @@ function buildMenu() {
         { label: 'Background Remover…', accelerator: 'CmdOrCtrl+B', click: () => send('bgtool') },
         { label: 'Import Image to Coin…', click: () => send('addimage') },
         { label: 'Generate Cut Outline…', accelerator: 'CmdOrCtrl+L', click: () => send('outline') },
+        { type: 'separator' },
+        { label: 'AI Assistant (MCP)…', click: () => send('assistant') },
       ]
     },
     {
@@ -192,5 +195,61 @@ ipcMain.handle('projects-remove', async (e, id) => {
   return true;
 });
 
+/* ---------- tiny settings store (userData/settings.json) ---------- */
+const SETTINGS_PATH = () => path.join(app.getPath('userData'), 'settings.json');
+function readSettings() {
+  try { return JSON.parse(fs.readFileSync(SETTINGS_PATH(), 'utf8')); } catch (e) { return {}; }
+}
+ipcMain.handle('settings-get', async (e, key) => readSettings()[String(key)]);
+ipcMain.handle('settings-set', async (e, key, value) => {
+  const s = readSettings();
+  s[String(key)] = value;
+  fs.writeFileSync(SETTINGS_PATH(), JSON.stringify(s, null, 1));
+  return true;
+});
+
+/* ---------- MCP server (AI assistant) ---------- */
+/* Tool calls run in the renderer, where the CF engine lives. */
+let execSeq = 0;
+const pendingExec = new Map();
+function execInRenderer(tool, args) {
+  return new Promise((resolve) => {
+    if (!win) return resolve({ error: 'app window closed' });
+    const id = ++execSeq;
+    const timer = setTimeout(() => {
+      pendingExec.delete(id);
+      resolve({ error: 'tool timed out (30s)' });
+    }, 30000);
+    pendingExec.set(id, { resolve, timer });
+    win.webContents.send('mcp-exec', { id, tool, args });
+  });
+}
+ipcMain.on('mcp-result', (e, { id, result }) => {
+  const p = pendingExec.get(id);
+  if (!p) return;
+  clearTimeout(p.timer);
+  pendingExec.delete(id);
+  p.resolve(result);
+});
+
+/* the renderer may only start the server when a valid Pro link exists —
+   it holds the link UI; main re-checks the stored link as a backstop */
+const linkValid = () => {
+  const l = readSettings()['ailink'];
+  return !!(l && (l.role === 'pro' || l.role === 'elite')
+    && (Date.now() - (l.at || 0)) < 1000 * 60 * 60 * 24 * 30);
+};
+ipcMain.handle('mcp-start', async () => {
+  if (!linkValid()) return { running: false, error: 'not linked' };
+  const exportsDir = path.join(PROJECTS_DIR(), 'exports');
+  return await mcp.start({
+    exec: execInRenderer,
+    exportsDir,
+    appVersion: app.getVersion(),
+  });
+});
+ipcMain.handle('mcp-stop', async () => { mcp.stop(); return { running: false }; });
+ipcMain.handle('mcp-status', async () => mcp.status());
+
 app.whenReady().then(createWindow);
-app.on('window-all-closed', () => app.quit());
+app.on('window-all-closed', () => { mcp.stop(); app.quit(); });

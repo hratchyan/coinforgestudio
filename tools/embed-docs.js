@@ -14,6 +14,7 @@ const ORDER = [
   ['LASER_WORKFLOW.md', 'laser', 'Laser Workflow'],
   ['SHORTCUTS.md', 'shortcuts', 'Keyboard Shortcuts'],
   ['FAQ.md', 'faq', 'FAQ & Troubleshooting'],
+  ['AI_ASSISTANT.md', 'assistant', 'AI Assistant (MCP)'],
   ['CUSTOMIZING.md', 'customizing', 'Customizing the App'],
 ];
 

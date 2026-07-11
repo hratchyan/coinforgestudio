@@ -247,6 +247,7 @@
         'outline': () => CF.outline.openModal(),
         'addimage': () => CF.flows.addImage(),
         'fit': () => CF.renderer.fit(),
+        'assistant': () => CF.assistant && CF.assistant.openDialog(),
         'help': () => CF.help.open(),
         'about': () => CF.help.about(),
         'shortcuts': () => CF.help.open('shortcuts'),
