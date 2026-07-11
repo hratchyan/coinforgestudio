@@ -5,7 +5,7 @@ Design rings of stars, coin-true arc text, motto banners — drop any photo dead
 with local AI background removal — then export DPI-exact art that lands in your laser
 software at the right size, every time.
 
-**[coinforgestudio.com](https://coinforgestudio.com)** · **[Launch the app](https://app.coinforgestudio.com)** · *by **Hratch Simonyan** · MIT License · v1.2.0*
+**[coinforgestudio.com](https://coinforgestudio.com)** · **[Launch the app](https://app.coinforgestudio.com)** · *by **Hratch Simonyan** · MIT License · v1.4.0*
 
 ![CoinForge icon](build/icon-256.png)
 
@@ -15,7 +15,7 @@ software at the right size, every time.
 
 | Way | How | Notes |
 | --- | --- | --- |
-| **In your browser** | [app.coinforgestudio.com](https://app.coinforgestudio.com) | Nothing to install; free account (Google sign-in) |
+| **In your browser** | [app.coinforgestudio.com](https://app.coinforgestudio.com) | Nothing to install; free account (Google sign-in). Optional [Pro plan](https://coinforgestudio.com/#pricing) adds cloud slots, the template vault & the AI assistant |
 | **Windows portable** ⭐ | Grab `CoinForgeStudio-Portable.exe` from [Releases](https://github.com/hratchyan/coinforgestudio/releases) | No install, no account, works fully offline — copy it anywhere |
 | **Windows installer** | `CoinForgeStudio-Setup.exe` from [Releases](https://github.com/hratchyan/coinforgestudio/releases) | Start-menu & desktop shortcuts |
 | **From source** | Clone, then `Launch CoinForge (Browser Mode).bat` | Runs the raw files in Edge/Chrome; zero dependencies |
