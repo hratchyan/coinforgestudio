@@ -166,9 +166,19 @@ function start({ exec, exportsDir, appVersion }) {
   const token = crypto.randomBytes(24).toString('base64url');
 
   server = http.createServer((req, res) => {
-    /* auth first, always */
-    const auth = req.headers['authorization'] || '';
-    if (auth !== 'Bearer ' + token) {
+    /* reject anything not addressed to loopback by name — blocks the
+       DNS-rebinding vector where a web page resolves its own host to
+       127.0.0.1 and tries to reach us */
+    const host = (req.headers['host'] || '').split(':')[0].toLowerCase();
+    if (host !== '127.0.0.1' && host !== 'localhost') { res.writeHead(403).end(); return; }
+
+    /* auth first, always — constant-time compare so the token can't be
+       recovered byte-by-byte via response timing */
+    const expected = 'Bearer ' + token;
+    const provided = req.headers['authorization'] || '';
+    const okAuth = provided.length === expected.length &&
+      crypto.timingSafeEqual(Buffer.from(provided), Buffer.from(expected));
+    if (!okAuth) {
       res.writeHead(401, { 'Content-Type': 'application/json' });
       return res.end(JSON.stringify({ error: 'unauthorized' }));
     }
@@ -273,8 +283,15 @@ async function handle(m, exec, exportsDir, appVersion) {
         /* export_art: main writes the file; renderer sent base64 */
         if (name === 'export_art' && r && r.fileB64) {
           fs.mkdirSync(exportsDir, { recursive: true });
-          const fname = (r.fileName || 'coin-export.png').replace(/[\\/:*?"<>|\x00-\x1f]/g, '_');
+          const fname = (r.fileName || 'coin-export.png')
+            .replace(/[\\/:*?"<>|\x00-\x1f]/g, '_')
+            .replace(/^\.+/, '_'); /* no leading dots — can't become '..' */
           const p = path.join(exportsDir, fname);
+          /* never trust a renderer-supplied name to stay in the folder */
+          const root = path.resolve(exportsDir);
+          if (path.resolve(p) !== root && !path.resolve(p).startsWith(root + path.sep)) {
+            return rpcError(m.id, -32603, 'invalid export path');
+          }
           fs.writeFileSync(p, Buffer.from(r.fileB64, 'base64'));
           r.json = Object.assign({ saved_to: p }, r.json || {});
           delete r.fileB64;

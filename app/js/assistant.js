@@ -56,6 +56,9 @@
           uid: CF.auth.user.uid,
           role: tier,
           createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          /* self-expiry for the Firestore TTL policy — orphaned links
+             (never read back by a desktop) get reaped automatically */
+          expireAt: firebase.firestore.Timestamp.fromDate(new Date(Date.now() + 60 * 60 * 1000)),
         });
         modal.close();
         CF.ui.toast('Linked — the desktop app will pick it up within seconds.', 4500);
