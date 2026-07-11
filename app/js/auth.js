@@ -21,7 +21,7 @@
   const forced = new URLSearchParams(location.search).has('authgate'); /* dev/testing */
   const required = (!window.native && HOSTED.test(location.hostname)) || forced;
 
-  CF.auth = { required, user: null };
+  CF.auth = { required, user: null, tier: 'free' };
   if (!required) return;
 
   if (typeof firebase === 'undefined' || !window.CF_FIREBASE_CONFIG) {
@@ -56,6 +56,12 @@
       'Prefer no account? The ',
       U.el('a', { href: 'https://github.com/hratchyan/coinforgestudio/releases', target: '_blank', rel: 'noopener' }, 'free desktop app'),
       ' needs none — same designer, works offline.'));
+    card.appendChild(U.el('p', { class: 'cf-auth-legal' },
+      'By continuing you agree to the ',
+      U.el('a', { href: 'https://coinforgestudio.com/terms-of-service', target: '_blank', rel: 'noopener' }, 'Terms'),
+      ' and ',
+      U.el('a', { href: 'https://coinforgestudio.com/privacy-policy', target: '_blank', rel: 'noopener' }, 'Privacy Policy'),
+      '.'));
     overlay.appendChild(card);
   }
 
@@ -238,11 +244,22 @@
     if (user.photoURL) chip.appendChild(U.el('img', { src: user.photoURL, referrerpolicy: 'no-referrer' }));
     else chip.appendChild(U.el('span', { class: 'cf-userchip-letter' }, (user.displayName || user.email || '?')[0].toUpperCase()));
     chip.addEventListener('click', () => {
-      CF.ui.menu(chip, [
+      const tier = CF.auth.tier || 'free';
+      const entries = [
         { label: user.displayName || user.email || 'Account', disabled: true },
+        { label: 'Plan: ' + tier.charAt(0).toUpperCase() + tier.slice(1), disabled: true },
         '-',
-        { label: 'Sign out', onClick: () => auth.signOut().then(() => location.reload()) },
-      ]);
+      ];
+      if (tier === 'free') {
+        entries.push({
+          label: 'Upgrade…',
+          onClick: () => CF.billing ? CF.billing.upgradeDialog() : window.open('https://coinforgestudio.com/#pricing', '_blank', 'noopener'),
+        });
+      } else {
+        entries.push({ label: 'Manage billing…', onClick: () => CF.billing && CF.billing.portal() });
+      }
+      entries.push('-', { label: 'Sign out', onClick: () => auth.signOut().then(() => location.reload()) });
+      CF.ui.menu(chip, entries);
     });
     const bar = U.$('#topbar');
     if (bar) bar.appendChild(chip);
@@ -255,11 +272,20 @@
     /* email-verified claim must be fresh in the ID token before Firestore
        will accept writes (rules check email_verified) */
     try { await user.getIdToken(true); } catch (e) { }
+    /* plan comes from a server-set custom claim (Stripe webhook writes
+       stripeRole) — the client can display it but never grant it */
+    CF.auth.tier = 'free';
+    try {
+      const tok = await user.getIdTokenResult();
+      const role = tok.claims && tok.claims.stripeRole;
+      if (role === 'pro' || role === 'elite') CF.auth.tier = role;
+    } catch (e) { }
     const data = await ensureUserDoc(user);
     applyPrefs(data);
     watchPrefs(user);
     mountChip(user);
     hideOverlay();
+    CF.bus.emit('auth');
   }
 
   const isVerified = (user) =>

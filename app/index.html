@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://apis.google.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.googleusercontent.com; font-src 'self' data:; connect-src 'self' data: blob: https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://www.googleapis.com; frame-src 'self' https://app.coinforgestudio.com https://coinforgestudio.firebaseapp.com https://accounts.google.com; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://apis.google.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.googleusercontent.com; font-src 'self' data:; connect-src 'self' data: blob: https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://firebasestorage.googleapis.com https://www.googleapis.com https://us-central1-coinforgestudio.cloudfunctions.net; frame-src 'self' https://app.coinforgestudio.com https://coinforgestudio.firebaseapp.com https://accounts.google.com; object-src 'none'; base-uri 'none'; form-action 'none'">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="author" content="Hratch Simonyan">
   <meta name="description" content="CoinForge Studio — coin & challenge-coin designer for laser engraving">
@@ -11,7 +11,7 @@
   <meta property="og:image" content="https://coinforgestudio.com/assets/demo-poster.jpg">
   <title>CoinForge Studio</title>
   <link rel="icon" type="image/png" href="favicon.png">
-  <link rel="stylesheet" href="css/app.css?v=1.2.0">
+  <link rel="stylesheet" href="css/app.css?v=1.4.0">
 </head>
 <body>
   <div id="app">
@@ -27,41 +27,44 @@
   </div>
 
   <!-- optional AI runtime (fails silently if missing) -->
-  <script src="vendor/ort.min.js?v=1.2.0"></script>
+  <script src="vendor/ort.min.js?v=1.4.0"></script>
 
   <!-- account gate for the hosted app (inert on desktop & local use) -->
-  <script src="vendor/firebase-app-compat.js?v=1.2.0"></script>
-  <script src="vendor/firebase-auth-compat.js?v=1.2.0"></script>
-  <script src="vendor/firebase-firestore-compat.js?v=1.2.0"></script>
-  <script src="js/firebase-config.js?v=1.2.0"></script>
+  <script src="vendor/firebase-app-compat.js?v=1.4.0"></script>
+  <script src="vendor/firebase-auth-compat.js?v=1.4.0"></script>
+  <script src="vendor/firebase-firestore-compat.js?v=1.4.0"></script>
+  <script src="vendor/firebase-storage-compat.js?v=1.4.0"></script>
+  <script src="js/firebase-config.js?v=1.4.0"></script>
 
   <!-- data -->
-  <script src="js/fonts-data.js?v=1.2.0"></script>
-  <script src="js/docs-embedded.js?v=1.2.0"></script>
+  <script src="js/fonts-data.js?v=1.4.0"></script>
+  <script src="js/docs-embedded.js?v=1.4.0"></script>
 
   <!-- core -->
-  <script src="js/util.js?v=1.2.0"></script>
-  <script src="js/geometry.js?v=1.2.0"></script>
-  <script src="js/symbols.js?v=1.2.0"></script>
-  <script src="js/glyphs.js?v=1.2.0"></script>
-  <script src="js/fonts.js?v=1.2.0"></script>
-  <script src="js/imagetools.js?v=1.2.0"></script>
-  <script src="js/ai.js?v=1.2.0"></script>
-  <script src="js/elements.js?v=1.2.0"></script>
-  <script src="js/store.js?v=1.2.0"></script>
-  <script src="js/ringpresets.js?v=1.2.0"></script>
-  <script src="js/templates.js?v=1.2.0"></script>
-  <script src="js/renderer.js?v=1.2.0"></script>
-  <script src="js/outline.js?v=1.2.0"></script>
-  <script src="js/interactions.js?v=1.2.0"></script>
-  <script src="js/inspector.js?v=1.2.0"></script>
-  <script src="js/panels.js?v=1.2.0"></script>
-  <script src="js/exporter.js?v=1.2.0"></script>
-  <script src="js/projects.js?v=1.2.0"></script>
-  <script src="js/bgstudio.js?v=1.2.0"></script>
-  <script src="js/help.js?v=1.2.0"></script>
-  <script src="js/auth.js?v=1.2.0"></script>
-  <script src="js/mobile.js?v=1.2.0"></script>
-  <script src="js/app.js?v=1.2.0"></script>
+  <script src="js/util.js?v=1.4.0"></script>
+  <script src="js/geometry.js?v=1.4.0"></script>
+  <script src="js/symbols.js?v=1.4.0"></script>
+  <script src="js/glyphs.js?v=1.4.0"></script>
+  <script src="js/fonts.js?v=1.4.0"></script>
+  <script src="js/imagetools.js?v=1.4.0"></script>
+  <script src="js/ai.js?v=1.4.0"></script>
+  <script src="js/elements.js?v=1.4.0"></script>
+  <script src="js/store.js?v=1.4.0"></script>
+  <script src="js/ringpresets.js?v=1.4.0"></script>
+  <script src="js/templates.js?v=1.4.0"></script>
+  <script src="js/renderer.js?v=1.4.0"></script>
+  <script src="js/outline.js?v=1.4.0"></script>
+  <script src="js/interactions.js?v=1.4.0"></script>
+  <script src="js/inspector.js?v=1.4.0"></script>
+  <script src="js/panels.js?v=1.4.0"></script>
+  <script src="js/exporter.js?v=1.4.0"></script>
+  <script src="js/projects.js?v=1.4.0"></script>
+  <script src="js/cloudprojects.js?v=1.4.0"></script>
+  <script src="js/billing.js?v=1.4.0"></script>
+  <script src="js/bgstudio.js?v=1.4.0"></script>
+  <script src="js/help.js?v=1.4.0"></script>
+  <script src="js/auth.js?v=1.4.0"></script>
+  <script src="js/mobile.js?v=1.4.0"></script>
+  <script src="js/app.js?v=1.4.0"></script>
 </body>
 </html>

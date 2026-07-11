@@ -4,9 +4,77 @@ service cloud.firestore {
 
     /* each signed-in, email-verified user owns exactly their own document */
     match /users/{uid} {
-      allow create, read, update, delete: if request.auth != null
-                                          && request.auth.uid == uid
-                                          && request.auth.token.email_verified == true;
+      function owner() {
+        return request.auth != null
+            && request.auth.uid == uid
+            && request.auth.token.email_verified == true;
+      }
+      /* the plan is server-authoritative: the Stripe webhook sets the
+         stripeRole custom claim; clients may never write a tier for
+         themselves (the legacy `tier` field is display-only and frozen) */
+      function tierUntouched() {
+        return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['tier']);
+      }
+      allow read, delete: if owner();
+      allow create: if owner()
+                    && request.resource.data.get('tier', 'free') == 'free';
+      allow update: if owner() && tierUntouched();
+
+      /* ---- cloud project slots (metadata; payloads live in Storage) ----
+         Slot ids are single digits 0-9. Two-tier model: Pro unlocks all
+         10 slots ('elite' accepted as legacy role, same entitlement).
+         The slot id in the path is what rules validate — stateless,
+         no counters to race. Reads and deletes work on any slot
+         regardless of plan, so a lapsed user never loses their work. */
+      match /projects/{slot} {
+        function role() {
+          return ('stripeRole' in request.auth.token) ? request.auth.token.stripeRole : '';
+        }
+        function slotAllowed() {
+          return slot.matches('[0-9]') && role() in ['pro', 'elite'];
+        }
+        /* list must be a separate grant: a collection query can't prove
+           the doc-id regex, so a combined `read` rule fails closed */
+        allow list: if owner();
+        allow get, delete: if owner() && slot.matches('[0-9]');
+        allow create, update: if owner()
+                              && slotAllowed()
+                              && request.resource.data.name is string
+                              && request.resource.data.name.size() <= 120
+                              && request.resource.data.modified is number
+                              && (!('thumb' in request.resource.data)
+                                  || request.resource.data.thumb == null
+                                  || (request.resource.data.thumb is string
+                                      && request.resource.data.thumb.size() < 200000));
+      }
+    }
+
+    /* ---- Stripe extension collections (Run Payments with Stripe) ----
+       The extension's webhook (Admin SDK) writes these; clients only
+       read their own billing data and create checkout sessions. */
+    match /customers/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+
+      match /checkout_sessions/{id} {
+        allow read, create: if request.auth != null && request.auth.uid == uid;
+      }
+      match /subscriptions/{id} {
+        allow read: if request.auth != null && request.auth.uid == uid;
+      }
+      match /payments/{id} {
+        allow read: if request.auth != null && request.auth.uid == uid;
+      }
+    }
+
+    /* public product catalog mirrored from Stripe */
+    match /products/{id} {
+      allow read: if true;
+      match /prices/{priceId} {
+        allow read: if true;
+      }
+      match /tax_rates/{taxId} {
+        allow read: if true;
+      }
     }
 
     /* everything else is closed */

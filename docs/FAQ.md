@@ -83,3 +83,37 @@ Projects → your project will still be there.
 
 **How do I add my own symbols / templates / fonts?**
 See `CUSTOMIZING.md` — that's the whole point of the plain-JS design.
+
+## Plans, accounts & cloud saves
+
+**What's free, and what's paid?**
+The designer is free — every tool, every export, no watermarks, forever. That's true in
+the browser at app.coinforgestudio.com (free account) and in the desktop app (no account
+at all). **Pro** ($59/year) adds the conveniences around the designer: cloud slots, the
+template & asset vault, and the AI assistant add-on.
+
+**Where do my projects live?**
+- *Desktop app:* real `.coin` files in `Documents\CoinForge Projects`. Yours, offline, forever.
+- *Browser (free):* saved in that browser's own storage — unlimited, but they stay on that
+  device. Export a `.coin` file for a backup you control.
+- *Pro cloud slots:* 10 numbered slots that follow your account — save on the desk PC,
+  open on the laptop or phone. `File → ☁ Save to cloud` (Ctrl+Shift+S) or the Projects
+  dialog (Ctrl+O).
+
+**What happens to my cloud projects if I cancel Pro?**
+Nothing is deleted, ever. Your slots become read-only — you can still open, export, and
+delete them; you just can't save new work into them. Resubscribe and they wake up.
+
+**How does billing work?**
+Annual, through Stripe (we never see your card number). Cancel anytime from your account
+menu → *Manage billing* — you keep Pro until the end of the paid period. Every charge has
+a 14-day no-questions money-back window: email contact@coinforgestudio.com.
+
+**What is the AI assistant (MCP) add-on?**
+An optional Pro feature (rolling out) that lets your own AI — Claude Desktop, Claude Code,
+or any MCP-compatible client — design coins with you: it places real elements, sees real
+previews, and hands you laser-ready art. Your AI subscription, your machine, your data.
+
+**Does the free version get worse over time?**
+No. The promise is structural: paid features are things *around* the designer (sync,
+content, AI) — never the designer itself. If a tool exists in CoinForge, it works in Free.

@@ -252,6 +252,39 @@
     @media (prefers-reduced-motion: reduce) {
       .belt-track { animation: none; }
     }
+
+    /* ---------- pricing ---------- */
+    .plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 34px; align-items: stretch; }
+    .plan {
+      position: relative;
+      background: var(--panel); border: 1px solid var(--line);
+      border-radius: 16px; padding: 28px 26px 24px;
+      display: flex; flex-direction: column; gap: 0;
+    }
+    .plan.hot { border-color: var(--brass-dk); box-shadow: 0 18px 60px rgba(217, 181, 68, 0.13); }
+    .plan-flag {
+      position: absolute; top: -11px; left: 50%; transform: translateX(-50%);
+      font-size: 10px; font-weight: 800; letter-spacing: 1.6px; text-transform: uppercase;
+      background: linear-gradient(180deg, var(--brass-hi), var(--brass));
+      color: #251d07; padding: 4px 14px; border-radius: 20px; white-space: nowrap;
+    }
+    .plan h3 { font-family: 'Cinzel', serif; font-weight: 700; font-size: 19px; letter-spacing: 1px; }
+    .plan .price { margin: 10px 0 2px; font-size: 38px; font-weight: 800; color: #f6f0e0; }
+    .plan .price small { font-size: 14px; font-weight: 500; color: var(--muted); }
+    .plan .price-note { font-size: 12.5px; color: var(--muted); min-height: 1.4em; }
+    .plan ul { list-style: none; margin: 18px 0 22px; display: grid; gap: 9px; font-size: 14.5px; color: #c9d0da; }
+    .plan li::before { content: '✓  '; color: var(--brass); font-weight: 700; }
+    .plan li.dim { color: var(--muted); }
+    .plan li.dim::before { content: '—  '; color: var(--line2); }
+    .plan .btn { justify-content: center; margin-top: auto; }
+    .plan .btn.soon { opacity: 0.55; cursor: default; pointer-events: none; }
+    .plans-2 { grid-template-columns: repeat(2, 1fr); max-width: 780px; margin-left: auto; margin-right: auto; }
+    .price-was { color: var(--muted); font-weight: 400; font-size: 24px; margin-right: 4px; }
+    .plans-note { margin-top: 18px; text-align: center; font-size: 13.5px; color: var(--muted); }
+    .plans-note b { color: #6fd39a; }
+    @media (max-width: 860px) {
+      .plans { grid-template-columns: 1fr; max-width: 430px; margin-left: auto; margin-right: auto; }
+    }
   </style>
 </head>
 <body>
@@ -262,6 +295,7 @@
       <div class="links">
         <a href="#features">Features</a>
         <a href="#workflow">Workflow</a>
+        <a href="#pricing">Pricing</a>
         <a href="https://github.com/hratchyan/coinforgestudio">GitHub</a>
         <a class="heart" href="#support" title="Support the project">♥</a>
         <a class="btn primary small" href="https://app.coinforgestudio.com">Launch App</a>
@@ -347,6 +381,44 @@
     </div>
   </section>
 
+  <section id="pricing">
+    <div class="wrap">
+      <h2 class="sec">Simple, honest pricing</h2>
+      <p class="sec-sub">The designer is free — every tool, every export, forever. Pro adds the cloud, the vault, and the AI.</p>
+      <div class="plans plans-2">
+        <div class="plan">
+          <h3>Free</h3>
+          <div class="price">$0</div>
+          <div class="price-note">forever · no card, ever</div>
+          <ul>
+            <li>The complete designer — every tool, no watermarks</li>
+            <li>Unlimited local projects (saved in your browser)</li>
+            <li>Full-quality PNG &amp; SVG export at exact DPI</li>
+            <li>Starter templates &amp; the full symbol library</li>
+            <li>Desktop app — offline, no account needed</li>
+            <li class="dim">Projects don't follow your account</li>
+          </ul>
+          <a class="btn" href="https://app.coinforgestudio.com">Start designing</a>
+        </div>
+        <div class="plan hot">
+          <div class="plan-flag">Early bird — first year $39</div>
+          <h3>Pro</h3>
+          <div class="price"><s class="price-was">$59</s> $39<small> first year</small></div>
+          <div class="price-note">then $59/year · limited-time launch price</div>
+          <ul>
+            <li>Everything in Free</li>
+            <li><b>10 cloud slots</b> — projects follow your account to any device</li>
+            <li>Full &amp; growing <b>template and asset vault</b></li>
+            <li><b>AI assistant (MCP)</b> — design coins with Claude &amp; friends</li>
+            <li>Supports the forge directly ☕</li>
+          </ul>
+          <a class="btn primary" href="https://app.coinforgestudio.com/#upgrade">Get Pro — $39</a>
+        </div>
+      </div>
+      <p class="plans-note">Secure payment by Stripe · cancel anytime · <b>14-day money-back guarantee</b> · lapsing never deletes your work.</p>
+    </div>
+  </section>
+
   <section class="alt" id="support">
     <div class="wrap">
       <div class="support-box">
@@ -354,8 +426,8 @@
           <h3>Free forever. Fueled by coffee.</h3>
           <p>
             Hi — I'm <b>Hratch</b>. I build CoinForge nights and weekends because I make coins too,
-            and the tool I wanted didn't exist. It's open source, has no ads, no tracking,
-            and no paywalls — and it stays that way.
+            and the tool I wanted didn't exist. It's open source, has no ads and no tracking,
+            and the designer itself is free — and stays that way.
           </p>
           <p>
             If it saved you an evening of fighting a vector editor, a coffee keeps the forge hot.
@@ -382,6 +454,9 @@
         <a href="https://github.com/hratchyan/coinforgestudio/blob/main/docs/USER_GUIDE.md">User Guide</a>
         <a href="https://github.com/hratchyan/coinforgestudio/blob/main/docs/LASER_WORKFLOW.md">Laser Workflow</a>
         <a href="https://github.com/hratchyan/coinforgestudio/blob/main/LICENSE">MIT License</a>
+        <a href="/privacy-policy">Privacy</a>
+        <a href="/terms-of-service">Terms</a>
+        <a href="/contact-us">Contact</a>
       </div>
     </div>
   </footer>

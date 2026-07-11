@@ -16,3 +16,6 @@ firebase-debug.log
 
 tools/.frames/
 tools/.clipframes/
+
+# private engineering journal — never commit
+private/

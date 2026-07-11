@@ -1,1 +1,24 @@
-{"projects":{"default":"coinforgestudio"},"targets":{"coinforgestudio":{"hosting":{"landing":["coinforgestudio"],"app":["app-coinforgestudio"]}}}}
+{
+  "projects": {
+    "default": "coinforgestudio"
+  },
+  "targets": {
+    "coinforgestudio": {
+      "hosting": {
+        "landing": [
+          "coinforgestudio"
+        ],
+        "app": [
+          "app-coinforgestudio"
+        ]
+      }
+    }
+  },
+  "etags": {
+    "coinforgestudio": {
+      "extensionInstances": {
+        "firestore-stripe-payments": "08c948a11446cd3a414b891ddc589ac30c987f516f43dc49cbeca62d34b8a7d9"
+      }
+    }
+  }
+}

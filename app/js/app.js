@@ -32,6 +32,9 @@
         '-',
         { label: 'Save', hint: 'Ctrl+S', onClick: () => CF.projects.saveCurrent() },
         { label: 'Save as new copy', onClick: () => CF.projects.saveCurrent({ saveAs: true }) },
+        ...(CF.cloud && CF.cloud.available()
+          ? [{ label: '☁ Save to cloud…', hint: 'Ctrl+Shift+S', onClick: () => CF.projects.cloudSaveDialog() }]
+          : []),
         '-',
         { label: 'Import .coin file…', onClick: () => CF.projects.importCoinFile() },
         { label: 'Export .coin file…', onClick: () => CF.projects.exportCoinFile() },
@@ -132,7 +135,12 @@
 
       if (mod && e.key.toLowerCase() === 'z') { e.preventDefault(); e.shiftKey ? S().redo() : S().undo(); return; }
       if (mod && e.key.toLowerCase() === 'y') { e.preventDefault(); S().redo(); return; }
-      if (mod && e.key.toLowerCase() === 's') { e.preventDefault(); CF.projects.saveCurrent({ saveAs: e.shiftKey }); return; }
+      if (mod && e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        if (e.shiftKey && CF.cloud && CF.cloud.available()) CF.projects.cloudSaveDialog();
+        else CF.projects.saveCurrent({ saveAs: e.shiftKey });
+        return;
+      }
       if (mod && e.key.toLowerCase() === 'o') { e.preventDefault(); CF.projects.openManager(); return; }
       if (mod && e.key.toLowerCase() === 'n') { e.preventDefault(); CF.projects.newCoinDialog(); return; }
       if (mod && e.key.toLowerCase() === 'e') { e.preventDefault(); CF.exporter.open(); return; }

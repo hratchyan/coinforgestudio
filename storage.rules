@@ -1,0 +1,36 @@
+rules_version = '2';
+
+/* CoinForge Studio — Cloud Storage rules.
+   Project payloads for the hosted app's cloud slots:
+     users/{uid}/projects/{slot}.json
+   The slot number in the filename is validated against the plan
+   (stripeRole custom claim, set server-side by the Stripe webhook).
+   Two-tier model: Pro → all 10 slots (0-9); 'elite' accepted as a
+   legacy role with the same entitlement. Reads/deletes are allowed
+   on any slot so a lapsed user can always retrieve their own work.
+   Everything else in the bucket is closed. */
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    match /users/{uid}/projects/{fname} {
+      function owner() {
+        return request.auth != null
+            && request.auth.uid == uid
+            && request.auth.token.email_verified == true;
+      }
+      function role() {
+        return ('stripeRole' in request.auth.token) ? request.auth.token.stripeRole : '';
+      }
+      allow read, delete: if owner() && fname.matches('[0-9]\\.json');
+      allow write: if owner()
+                   && request.resource.size < 20 * 1024 * 1024
+                   && request.resource.contentType == 'application/json'
+                   && fname.matches('[0-9]\\.json')
+                   && role() in ['pro', 'elite'];
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

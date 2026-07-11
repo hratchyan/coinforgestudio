@@ -2,12 +2,19 @@
   "firestore": {
     "rules": "firestore.rules"
   },
+  "storage": {
+    "rules": "storage.rules"
+  },
+  "extensions": {
+    "firestore-stripe-payments": "invertase/firestore-stripe-payments@0.3.11"
+  },
   "hosting": [
     {
       "target": "landing",
       "public": "site",
       "ignore": ["**/.*", "**/node_modules/**"],
       "cleanUrls": true,
+      "trailingSlash": false,
       "headers": [
         {
           "source": "assets/**",
