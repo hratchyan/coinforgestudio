@@ -26,13 +26,18 @@
   let currentSnap = null;
   let transientPre = null;
 
-  S.newDoc = function (diameterMM = 44.45, name = 'Untitled Coin') {
+  /* spec: number = circle diameter (legacy callers), or a substrate object
+     {kind:'circle'|'rect'|'rounded', diameterMM | wMM/hMM(/cornerRMM), marginMM} */
+  S.newDoc = function (spec = 44.45, name) {
+    const sub = typeof spec === 'number'
+      ? { kind: 'circle', diameterMM: spec, marginMM: 2 }
+      : Object.assign({ marginMM: spec.kind === 'circle' ? 2 : 4 }, spec);
     S.doc = {
       version: 2,
       id: U.uid(),
-      name,
+      name: name || (sub.kind === 'circle' ? 'Untitled Coin' : 'Untitled Card'),
       author: CF.AUTHOR,
-      coin: { diameterMM, marginMM: 2 },
+      substrate: sub,
       dpi: 1016,
       groups: [],
       elements: []

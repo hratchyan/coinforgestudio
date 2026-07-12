@@ -94,7 +94,9 @@
   /* ============ Add tab ============ */
   function buildAdd(pane) {
     pane.innerHTML = '';
+    const isRound = CF.substrate.kind(S().doc) === 'circle';
     const R = () => CF.substrate.maxDimMM(S().doc) / 2;
+    const CH = () => CF.substrate.sizeMM(S().doc).h; /* card height for stacking */
     const year = String(new Date().getFullYear());
 
     const grid = U.el('div', { class: 'cf-addgrid' });
@@ -106,14 +108,20 @@
     };
 
     btn('T', 'Text', () => S().addElement(CF.Elements.create('text', { text: 'YOUR TEXT', sizeMM: R() * 0.18 })));
-    btn('⌒', 'Arc Text', () => S().addElement(CF.Elements.create('arctext', { text: 'ARC TEXT AROUND', radiusMM: R() - 3, sizeMM: R() * 0.15 })));
+    if (isRound) {
+      btn('⌒', 'Arc Text', () => S().addElement(CF.Elements.create('arctext', { text: 'ARC TEXT AROUND', radiusMM: R() - 3, sizeMM: R() * 0.15 })));
+    }
     btn('✦', 'Symbol', () => CF.pickers.symbol(pick =>
       S().addElement(CF.Elements.create('symbol', Object.assign({ sizeMM: R() * 0.5 }, pick)))));
-    btn('◌', 'Symbol Ring', () => S().addElement(CF.Elements.create('symbolring', { radiusMM: R() - 4.5, itemSizeMM: R() * 0.11 })));
-    btn('◎', 'Ring Band', () => S().addElement(CF.Elements.create('ringband', { radiusMM: R() - 2, thicknessMM: 1.2 })));
+    if (isRound) {
+      btn('◌', 'Symbol Ring', () => S().addElement(CF.Elements.create('symbolring', { radiusMM: R() - 4.5, itemSizeMM: R() * 0.11 })));
+      btn('◎', 'Ring Band', () => S().addElement(CF.Elements.create('ringband', { radiusMM: R() - 2, thicknessMM: 1.2 })));
+    }
     btn('⌢', 'Banner', () => S().addElement(CF.Elements.create('banner', { wMM: R() * 1.15, hMM: R() * 0.16, sizeMM: R() * 0.1, y: R() * 0.55 })));
     btn('▣', 'Image', () => CF.flows.addImage(), 'Import a photo — background removal & smart fit included');
     btn('★', 'Shape', () => S().addElement(CF.Elements.create('shape', { sizeMM: R() * 0.5 })));
+    btn('▦', 'QR Code', () => S().addElement(CF.Elements.create('qr', { sizeMM: Math.min(R() * 0.55, 20) })),
+      'Offline QR code — URL, phone number, Wi-Fi or vCard text');
 
     pane.appendChild(U.el('div', { class: 'cf-pane-title' }, 'Add elements'));
     pane.appendChild(grid);
@@ -126,12 +134,31 @@
       b.addEventListener('click', fn);
       quick.appendChild(b);
     };
-    qbtn(year.slice(2), 'Year', () => S().addElement(CF.Elements.create('text', { name: 'Year', text: year, weight: 700, sizeMM: R() * 0.16, y: R() * 0.55 })));
-    qbtn('EST', 'Established', () => S().addElement(CF.Elements.create('arctext', { name: 'Established', text: 'EST. ' + year, radiusMM: R() - 3, sizeMM: R() * 0.12, side: 'bottom', centerDeg: 180 })));
-    qbtn('“', 'Motto Banner', () => S().addElement(CF.Elements.create('banner', { name: 'Motto', text: 'YOUR MOTTO', wMM: R() * 1.2, hMM: R() * 0.16, sizeMM: R() * 0.1, curveDeg: 48, y: R() * 0.58 })));
-    qbtn('Aa', 'Signature', () => S().addElement(CF.Elements.create('text', { name: 'Signature', text: 'Your Name', font: CF.Fonts.defaultScript(), weight: 400, sizeMM: R() * 0.2, y: R() * 0.35 })));
-    qbtn('M', 'Mint Mark', () => S().addElement(CF.Elements.create('text', { name: 'Mint mark', text: 'M', weight: 700, sizeMM: R() * 0.1, x: R() * 0.55, y: R() * 0.55 })));
-    qbtn('#', 'Serial No.', () => S().addElement(CF.Elements.create('text', { name: 'Serial', text: 'No. 0001', font: 'Special Elite', weight: 400, sizeMM: R() * 0.09, y: R() * 0.72 })));
+    if (isRound) {
+      qbtn(year.slice(2), 'Year', () => S().addElement(CF.Elements.create('text', { name: 'Year', text: year, weight: 700, sizeMM: R() * 0.16, y: R() * 0.55 })));
+      qbtn('EST', 'Established', () => S().addElement(CF.Elements.create('arctext', { name: 'Established', text: 'EST. ' + year, radiusMM: R() - 3, sizeMM: R() * 0.12, side: 'bottom', centerDeg: 180 })));
+      qbtn('“', 'Motto Banner', () => S().addElement(CF.Elements.create('banner', { name: 'Motto', text: 'YOUR MOTTO', wMM: R() * 1.2, hMM: R() * 0.16, sizeMM: R() * 0.1, curveDeg: 48, y: R() * 0.58 })));
+      qbtn('Aa', 'Signature', () => S().addElement(CF.Elements.create('text', { name: 'Signature', text: 'Your Name', font: CF.Fonts.defaultScript(), weight: 400, sizeMM: R() * 0.2, y: R() * 0.35 })));
+      qbtn('M', 'Mint Mark', () => S().addElement(CF.Elements.create('text', { name: 'Mint mark', text: 'M', weight: 700, sizeMM: R() * 0.1, x: R() * 0.55, y: R() * 0.55 })));
+      qbtn('#', 'Serial No.', () => S().addElement(CF.Elements.create('text', { name: 'Serial', text: 'No. 0001', font: 'Special Elite', weight: 400, sizeMM: R() * 0.09, y: R() * 0.72 })));
+    } else {
+      /* contact quick-adds for cards & tags */
+      const txt = (name, text, opts) => S().addElement(CF.Elements.create('text', Object.assign({ name, text }, opts)));
+      qbtn('⎘', 'Contact Block', () => {
+        const H = CH();
+        S().addElements([
+          CF.Elements.create('text', { name: 'Name', text: 'YOUR NAME', weight: 700, sizeMM: H * 0.13, y: -H * 0.22 }),
+          CF.Elements.create('text', { name: 'Title', text: 'Your Title', sizeMM: H * 0.07, y: -H * 0.08 }),
+          CF.Elements.create('text', { name: 'Phone', text: '+1 (555) 123-4567', sizeMM: H * 0.065, y: H * 0.12 }),
+          CF.Elements.create('text', { name: 'Email', text: 'you@example.com', sizeMM: H * 0.065, y: H * 0.24 }),
+        ]);
+      }, 'Name, title, phone and email in one go');
+      qbtn('Aa', 'Name', () => txt('Name', 'YOUR NAME', { weight: 700, sizeMM: CH() * 0.13, y: -CH() * 0.2 }));
+      qbtn('☏', 'Phone', () => txt('Phone', '+1 (555) 123-4567', { sizeMM: CH() * 0.07, y: CH() * 0.12 }));
+      qbtn('@', 'Email', () => txt('Email', 'you@example.com', { sizeMM: CH() * 0.07, y: CH() * 0.24 }));
+      qbtn('www', 'Website', () => txt('Web', 'yoursite.com', { sizeMM: CH() * 0.07, y: CH() * 0.35 }));
+      qbtn('#', 'Serial No.', () => txt('Serial', 'No. 0001', { font: 'Special Elite', sizeMM: CH() * 0.07, y: CH() * 0.35 }));
+    }
 
     pane.appendChild(quick);
     pane.appendChild(U.el('p', { class: 'cf-hint' },
@@ -202,6 +229,11 @@
   function buildRings(pane) {
     pane.innerHTML = '';
     pane.appendChild(U.el('div', { class: 'cf-pane-title' }, 'Ring presets'));
+    if (CF.substrate.radiusMM(S().doc) === null) {
+      pane.appendChild(U.el('p', { class: 'cf-hint' },
+        'Ring presets need a round blank. Start a coin design (File → New design…) to use them.'));
+      return;
+    }
     pane.appendChild(U.el('p', { class: 'cf-hint' }, 'Curated frames sized to your coin. They add editable elements — tweak everything afterwards.'));
     const list = U.el('div', { class: 'cf-cardlist' });
     for (const p of CF.RingPresets.all()) {
@@ -224,8 +256,8 @@
   /* ============ Templates tab ============ */
   function buildTemplates(pane) {
     pane.innerHTML = '';
-    pane.appendChild(U.el('div', { class: 'cf-pane-title' }, 'Coin templates'));
-    pane.appendChild(U.el('p', { class: 'cf-hint' }, 'Full starting layouts. Apply replaces the current design (or merges on top).'));
+    pane.appendChild(U.el('div', { class: 'cf-pane-title' }, 'Templates'));
+    pane.appendChild(U.el('p', { class: 'cf-hint' }, 'Full starting layouts — coins and cards. Apply replaces the current design (or merges on top).'));
     const list = U.el('div', { class: 'cf-cardlist' });
     for (const cat of CF.Templates.categories()) {
       list.appendChild(U.el('div', { class: 'cf-subhead' }, cat.label));

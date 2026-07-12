@@ -27,7 +27,7 @@
     const g1 = grp();
     const fileBtn = btn('File ▾', 'File menu', () => {
       CF.ui.menu(fileBtn, [
-        { label: 'New coin…', hint: 'Ctrl+N', onClick: () => CF.projects.newCoinDialog() },
+        { label: 'New design…', hint: 'Ctrl+N', onClick: () => CF.projects.newCoinDialog() },
         { label: 'Projects…', hint: 'Ctrl+O', onClick: () => CF.projects.openManager() },
         '-',
         { label: 'Save', hint: 'Ctrl+S', onClick: () => CF.projects.saveCurrent() },

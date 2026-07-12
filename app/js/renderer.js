@@ -201,9 +201,35 @@
     ctx.stroke();
   };
 
+  /* horizontal brushed-slab finish (cards) — seeded like drawBrushed */
+  function drawBrushedSlab(ctx, cx, cy, wPx, hPx, seedKey) {
+    let c = brushCache.get(seedKey);
+    if (!c) {
+      const W = Math.max(2, Math.round(wPx)), H = Math.max(2, Math.round(hPx));
+      const off = U.makeCanvas(W, H);
+      const octx = off.ctx;
+      let rnd = 98765;
+      const rand = () => { rnd = (rnd * 1103515245 + 12345) & 0x7fffffff; return rnd / 0x7fffffff; };
+      for (let i = 0; i < 120; i++) {
+        const y = rand() * H;
+        const x0 = rand() * W * 0.5;
+        const len = W * (0.3 + rand() * 0.7);
+        octx.beginPath();
+        octx.moveTo(x0, y);
+        octx.lineTo(Math.min(W, x0 + len), y + (rand() - 0.5) * 2);
+        octx.strokeStyle = rand() > 0.5 ? 'rgba(255,255,255,0.045)' : 'rgba(0,0,0,0.05)';
+        octx.lineWidth = 0.6 + rand() * 1.3;
+        octx.stroke();
+      }
+      c = off.canvas;
+      if (brushCache.size > 6) brushCache.clear();
+      brushCache.set(seedKey, c);
+    }
+    ctx.drawImage(c, cx - wPx / 2, cy - hPx / 2, wPx, hPx);
+  }
+
   /* substrate-aware blank dispatcher — circles keep the original drawMetal
-     path untouched; rect/rounded get a flat P0 stub (full treatment in the
-     Cards phase) */
+     path untouched; rect/rounded get the slab treatment */
   R.drawBlank = function (ctx, doc, cx, cy, pxPerMM, metalId) {
     const sub = CF.substrate.get(doc);
     if (sub.kind === 'circle') {
@@ -213,17 +239,48 @@
     const m = METALS[metalId] || METALS.brass;
     const { w, h } = CF.substrate.sizeMM(doc);
     const wPx = w * pxPerMM, hPx = h * pxPerMM;
+    const minPx = Math.min(wPx, hPx);
+
+    /* drop shadow */
     ctx.save();
-    const g = ctx.createLinearGradient(cx - wPx / 2, cy - hPx / 2, cx + wPx / 2, cy + hPx / 2);
+    CF.substrate.trace(ctx, doc, cx + minPx * 0.015, cy + minPx * 0.03, pxPerMM);
+    ctx.fillStyle = 'rgba(0,0,0,0.45)';
+    ctx.filter = `blur(${Math.max(2, minPx * 0.035)}px)`;
+    ctx.fill();
+    ctx.restore();
+
+    /* base */
+    const g = ctx.createLinearGradient(cx - wPx * 0.5, cy - hPx * 0.6, cx + wPx * 0.5, cy + hPx * 0.65);
     g.addColorStop(0, m.hi);
-    g.addColorStop(0.5, m.mid);
+    g.addColorStop(0.48, m.mid);
     g.addColorStop(1, m.lo);
     CF.substrate.trace(ctx, doc, cx, cy, pxPerMM);
     ctx.fillStyle = g;
     ctx.fill();
-    CF.substrate.trace(ctx, doc, cx, cy, pxPerMM, { shrink: 0.99 });
-    ctx.lineWidth = Math.max(1, Math.min(wPx, hPx) * 0.012);
+
+    /* brushed finish + sheen, clipped inside the blank */
+    ctx.save();
+    CF.substrate.trace(ctx, doc, cx, cy, pxPerMM, { shrink: 0.995 });
+    ctx.clip();
+    drawBrushedSlab(ctx, cx, cy, wPx, hPx, 'slab|' + metalId + '|' + Math.round(wPx / 40) + 'x' + Math.round(hPx / 40));
+    const sh = ctx.createLinearGradient(cx - wPx / 2, cy - hPx / 2, cx + wPx / 2, cy + hPx / 2);
+    sh.addColorStop(0, 'rgba(255,255,255,0)');
+    sh.addColorStop(0.42, 'rgba(255,255,255,0.13)');
+    sh.addColorStop(0.5, 'rgba(255,255,255,0.02)');
+    sh.addColorStop(1, 'rgba(0,0,0,0.08)');
+    ctx.fillStyle = sh;
+    ctx.fillRect(cx - wPx / 2, cy - hPx / 2, wPx, hPx);
+    ctx.restore();
+
+    /* rim */
+    ctx.save();
+    CF.substrate.trace(ctx, doc, cx, cy, pxPerMM, { insetMM: Math.min(w, h) * 0.008 });
+    ctx.lineWidth = minPx * 0.014;
     ctx.strokeStyle = m.rim;
+    ctx.stroke();
+    CF.substrate.trace(ctx, doc, cx, cy, pxPerMM, { insetMM: Math.min(w, h) * 0.024 });
+    ctx.lineWidth = minPx * 0.005;
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)';
     ctx.stroke();
     ctx.restore();
   };

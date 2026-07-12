@@ -17,6 +17,15 @@
     };
   }
 
+  /* card/tag templates carry their own substrate (fixed real-world sizes) */
+  function cardDoc(name, wMM, hMM, cornerRMM, elements) {
+    return {
+      version: 3, id: CF.util.uid(), name, author: CF.AUTHOR,
+      substrate: { kind: cornerRMM > 0 ? 'rounded' : 'rect', wMM, hMM, cornerRMM, marginMM: 4 },
+      dpi: 1016, elements
+    };
+  }
+
   const ring = (id, R) => CF.RingPresets.get(id).build(R);
 
   const TEMPLATES = [
@@ -252,6 +261,46 @@
           ...ring('minimal', R),
           E().create('text', { name: 'Main', text: 'MAKE\nTHINGS', font: bebas, weight: 400, sizeMM: R * 0.34, lineHeight: 0.95 }),
           E().create('text', { name: 'Year', text: '· ' + year + ' ·', sizeMM: R * 0.09, weight: 400, y: R * 0.62, letterSpacing: 1 }),
+        ]);
+      }
+    },
+    {
+      id: 'card-contact', label: 'Contact Card', cat: 'Cards',
+      desc: 'Clean centered business card — name, title, contact lines.',
+      build() {
+        const W = 85.6, H = 54;
+        return cardDoc('Contact Card', W, H, 3.18, [
+          E().create('text', { name: 'Name', text: 'ALEX MORGAN', weight: 700, sizeMM: 7, y: -H * 0.22 }),
+          E().create('text', { name: 'Title', text: 'Product Designer', sizeMM: 3.6, y: -H * 0.08 }),
+          E().create('shape', { name: 'Rule', kind: 'line', params: { thickPct: 4 }, sizeMM: W * 0.55, y: H * 0.02 }),
+          E().create('text', { name: 'Phone', text: '+1 (555) 123-4567', sizeMM: 3.2, y: H * 0.15 }),
+          E().create('text', { name: 'Email', text: 'alex@example.com', sizeMM: 3.2, y: H * 0.26 }),
+          E().create('text', { name: 'Web', text: 'example.com', sizeMM: 3.2, y: H * 0.37 }),
+        ]);
+      }
+    },
+    {
+      id: 'card-qr', label: 'QR Business Card', cat: 'Cards',
+      desc: 'Contact details on the left, scannable QR code on the right.',
+      build() {
+        const W = 85.6, H = 54;
+        return cardDoc('QR Business Card', W, H, 3.18, [
+          E().create('text', { name: 'Name', text: 'ALEX MORGAN', weight: 700, sizeMM: 5.6, x: -W * 0.15, y: -H * 0.24 }),
+          E().create('text', { name: 'Title', text: 'Product Designer', sizeMM: 3.2, x: -W * 0.15, y: -H * 0.10 }),
+          E().create('text', { name: 'Phone', text: '+1 (555) 123-4567', sizeMM: 3, x: -W * 0.15, y: H * 0.10 }),
+          E().create('text', { name: 'Email', text: 'alex@example.com', sizeMM: 3, x: -W * 0.15, y: H * 0.22 }),
+          E().create('qr', { name: 'QR', text: 'https://example.com', sizeMM: H * 0.52, x: W * 0.29 }),
+        ]);
+      }
+    },
+    {
+      id: 'card-pettag', label: 'Pet / ID Tag', cat: 'Cards',
+      desc: 'Dog-tag blank with a bold name and return info.',
+      build() {
+        const W = 50.8, H = 28.6;
+        return cardDoc('Pet Tag', W, H, 6, [
+          E().create('text', { name: 'Name', text: 'LUNA', weight: 700, sizeMM: 8, y: -H * 0.13 }),
+          E().create('text', { name: 'Phone', text: 'IF FOUND: +1 (555) 123-4567', sizeMM: 1.9, y: H * 0.24 }),
         ]);
       }
     },

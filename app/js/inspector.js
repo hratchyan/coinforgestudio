@@ -242,22 +242,44 @@
     nameInp.addEventListener('keydown', e => e.stopPropagation());
     frag.appendChild(fieldRow('Project name', nameInp));
 
-    /* diameter with unit toggle */
     const sub = CF.substrate.get(doc);
-    const dval = unit === 'in' ? U.round(U.mm2in(sub.diameterMM), 3) : U.round(sub.diameterMM, 2);
-    const dInp = U.el('input', { class: 'cf-input', type: 'number', step: unit === 'in' ? 0.005 : 0.5, min: 5, value: dval });
-    const uSel = U.el('select', { class: 'cf-input cf-unit-sel' },
-      U.el('option', { value: 'mm', selected: unit === 'mm' ? '' : null }, 'mm'),
-      U.el('option', { value: 'in', selected: unit === 'in' ? '' : null }, 'in'));
-    dInp.addEventListener('change', () => {
-      let v = parseFloat(dInp.value);
-      if (isNaN(v) || v <= 0) return;
-      const mm = S().ui.unit === 'in' ? U.in2mm(v) : v;
-      S().mutate(d => { d.substrate.diameterMM = U.clamp(mm, 5, 300); });
-      CF.renderer.fit();
-    });
-    uSel.addEventListener('change', () => { S().setUI({ unit: uSel.value }); render(); });
-    frag.appendChild(fieldRow('Coin diameter', U.el('div', { class: 'cf-num-wrap' }, dInp, uSel)));
+    const isRound = sub.kind === 'circle';
+
+    if (isRound) {
+      /* diameter with unit toggle */
+      const dval = unit === 'in' ? U.round(U.mm2in(sub.diameterMM), 3) : U.round(sub.diameterMM, 2);
+      const dInp = U.el('input', { class: 'cf-input', type: 'number', step: unit === 'in' ? 0.005 : 0.5, min: 5, value: dval });
+      const uSel = U.el('select', { class: 'cf-input cf-unit-sel' },
+        U.el('option', { value: 'mm', selected: unit === 'mm' ? '' : null }, 'mm'),
+        U.el('option', { value: 'in', selected: unit === 'in' ? '' : null }, 'in'));
+      dInp.addEventListener('change', () => {
+        let v = parseFloat(dInp.value);
+        if (isNaN(v) || v <= 0) return;
+        const mm = S().ui.unit === 'in' ? U.in2mm(v) : v;
+        S().mutate(d => { d.substrate.diameterMM = U.clamp(mm, 5, 300); });
+        CF.renderer.fit();
+      });
+      uSel.addEventListener('change', () => { S().setUI({ unit: uSel.value }); render(); });
+      frag.appendChild(fieldRow('Coin diameter', U.el('div', { class: 'cf-num-wrap' }, dInp, uSel)));
+    } else {
+      /* card dimensions */
+      const mkDim = (label, key, min, max) => {
+        const inp = U.el('input', { class: 'cf-input', type: 'number', step: 0.5, min, max, value: U.round(sub[key] || 0, 2) });
+        inp.addEventListener('change', () => {
+          const v = parseFloat(inp.value);
+          if (isNaN(v)) return;
+          S().mutate(d => {
+            d.substrate[key] = U.clamp(v, min, max);
+            if (key === 'cornerRMM') d.substrate.kind = d.substrate.cornerRMM > 0 ? 'rounded' : 'rect';
+          });
+          CF.renderer.fit();
+        });
+        frag.appendChild(fieldRow(label, U.el('div', { class: 'cf-num-wrap' }, inp, U.el('span', { class: 'cf-unit' }, 'mm'))));
+      };
+      mkDim('Width', 'wMM', 10, 300);
+      mkDim('Height', 'hMM', 10, 300);
+      mkDim('Corner radius', 'cornerRMM', 0, 20);
+    }
 
     const mInp = U.el('input', { class: 'cf-input', type: 'number', step: 0.25, min: 0, max: 15, value: sub.marginMM });
     mInp.addEventListener('change', () => S().mutate(d => { d.substrate.marginMM = U.clamp(parseFloat(mInp.value) || 0, 0, 15); }));
@@ -287,7 +309,47 @@
       U.el('label', { class: 'cf-check-label' }, relief, ' Relief preview'),
       U.el('label', { class: 'cf-check-label' }, guides, ' Guides')));
 
-    return section('Coin', frag);
+    return section(isRound ? 'Coin' : 'Card', frag);
+  }
+
+  /* ---------- align to blank (safe-margin box) ---------- */
+  function alignSel(ids, mode) {
+    const doc = S().doc;
+    const { w, h } = CF.substrate.sizeMM(doc);
+    const m = CF.substrate.marginMM(doc) || 0;
+    const bw2 = w / 2 - m, bh2 = h / 2 - m;
+    S().mutate(d => {
+      for (const id of ids) {
+        const t = d.elements.find(x => x.id === id);
+        if (!t || CF.Elements.isRingLike(t)) continue;
+        const b = CF.Elements.boundsOf(t);
+        const a = U.deg2rad(t.rotation || 0);
+        const ew = (Math.abs(b.w * Math.cos(a)) + Math.abs(b.h * Math.sin(a))) / 2;
+        const eh = (Math.abs(b.w * Math.sin(a)) + Math.abs(b.h * Math.cos(a))) / 2;
+        if (mode === 'left') t.x = -bw2 + ew;
+        else if (mode === 'hcenter') t.x = 0;
+        else if (mode === 'right') t.x = bw2 - ew;
+        else if (mode === 'top') t.y = -bh2 + eh;
+        else if (mode === 'vcenter') t.y = 0;
+        else if (mode === 'bottom') t.y = bh2 - eh;
+      }
+    });
+  }
+
+  function alignRow(ids) {
+    const row = U.el('div', { class: 'cf-btn-row cf-wrap' });
+    const mk = (label, title, mode) => {
+      const b = U.el('button', { class: 'cf-btn cf-btn-sm', title }, label);
+      b.addEventListener('click', () => alignSel(ids, mode));
+      row.appendChild(b);
+    };
+    mk('⇤', 'Align left (inside safe margin)', 'left');
+    mk('↔', 'Center horizontally', 'hcenter');
+    mk('⇥', 'Align right', 'right');
+    mk('⤒', 'Align top', 'top');
+    mk('↕', 'Center vertically', 'vcenter');
+    mk('⤓', 'Align bottom', 'bottom');
+    return row;
   }
 
   /* ---------- selection section ---------- */
@@ -307,6 +369,8 @@
       bDel.addEventListener('click', () => S().removeSelected());
       row.appendChild(bC); row.appendChild(bDel);
       frag.appendChild(row);
+      frag.appendChild(U.el('div', { class: 'cf-field-label' }, 'Align to blank'));
+      frag.appendChild(alignRow(els.map(e => e.id)));
       return section('Selection', frag);
     }
 
@@ -350,7 +414,8 @@
     return U.el('div', null,
       section(h.label + ' — ' + (el.name || ''), frag),
       section('Position & Tone', common),
-      section('Arrange', arr));
+      section('Arrange', arr),
+      ...(CF.Elements.isRingLike(el) ? [] : [section('Align to blank', alignRow([el.id]))]));
   }
 
   function render() {

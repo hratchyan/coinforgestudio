@@ -653,6 +653,60 @@
     ]
   };
 
+  /* ---------- QR code (generated fully offline by qr.js) ---------- */
+  H.qr = {
+    label: 'QR Code',
+    defaults: () => ({ text: 'https://coinforgestudio.com', ecl: 'M', sizeMM: 16, quiet: true }),
+    render(ctx, el) {
+      const qr = CF.QR.cached(el.text || ' ', el.ecl || 'M');
+      const s = el.sizeMM / 2;
+      if (!qr) { /* too long for v10 — hollow warning frame instead of stale art */
+        ctx.lineWidth = 0.5;
+        ctx.strokeRect(-s, -s, el.sizeMM, el.sizeMM);
+        ctx.beginPath();
+        ctx.moveTo(-s, -s); ctx.lineTo(s, s);
+        ctx.moveTo(s, -s); ctx.lineTo(-s, s);
+        ctx.stroke();
+        return;
+      }
+      const quiet = el.quiet === false ? 0 : 4;
+      const mod = el.sizeMM / (qr.size + quiet * 2);
+      const o = -s;
+      for (let y = 0; y < qr.size; y++) {
+        for (let x = 0; x < qr.size; x++) {
+          if (qr.get(x, y)) ctx.fillRect(o + (x + quiet) * mod, o + (y + quiet) * mod, mod * 1.002, mod * 1.002);
+        }
+      }
+    },
+    bounds(el) { return { w: el.sizeMM, h: el.sizeMM }; },
+    scaleBy(el, f) { el.sizeMM = Math.max(4, el.sizeMM * f); },
+    toSVG(el, fill) {
+      const qr = CF.QR.cached(el.text || ' ', el.ecl || 'M');
+      if (!qr) return '';
+      const quiet = el.quiet === false ? 0 : 4;
+      const mod = el.sizeMM / (qr.size + quiet * 2);
+      const o = -el.sizeMM / 2;
+      let s = `<g fill="${fill}">`;
+      for (let y = 0; y < qr.size; y++) {
+        let x = 0;
+        while (x < qr.size) { /* merge horizontal runs to keep the SVG small */
+          if (!qr.get(x, y)) { x++; continue; }
+          let x2 = x;
+          while (x2 < qr.size && qr.get(x2, y)) x2++;
+          s += `<rect x="${num(o + (x + quiet) * mod)}" y="${num(o + (y + quiet) * mod)}" width="${num((x2 - x) * mod)}" height="${num(mod)}"/>`;
+          x = x2;
+        }
+      }
+      return s + '</g>';
+    },
+    inspector: [
+      { key: 'text', label: 'Content (URL / text)', kind: 'textarea' },
+      { key: 'sizeMM', label: 'Size', kind: 'number', min: 6, max: 100, step: 0.5, unit: 'mm' },
+      { key: 'ecl', label: 'Error correction', kind: 'select', options: [['L', 'L — 7% (densest)'], ['M', 'M — 15% (default)'], ['Q', 'Q — 25%'], ['H', 'H — 30% (engraving-safe)']] },
+      { key: 'quiet', label: 'Quiet zone (keep on for scanning)', kind: 'checkbox' },
+    ]
+  };
+
   /* ============================================================
      Public API
      ============================================================ */

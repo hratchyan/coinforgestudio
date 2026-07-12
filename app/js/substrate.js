@@ -29,6 +29,8 @@
     if (!doc) return doc;
     if (!doc.substrate) doc.substrate = fromCoin(doc.coin);
     if (!doc.material) doc.material = 'metal';
+    /* non-circle docs are a v1.7 format — older clients would misread them */
+    if (doc.substrate.kind !== 'circle' && (doc.version || 0) < 3) doc.version = 3;
     if (doc.substrate.kind === 'circle') {
       doc.coin = { diameterMM: doc.substrate.diameterMM, marginMM: doc.substrate.marginMM };
     } else if (doc.coin) {

@@ -249,36 +249,94 @@
     inp.click();
   }
 
-  /* ================= new coin dialog ================= */
+  /* ================= new design dialog (coin / card) ================= */
+  const COIN_SIZES = [
+    ['38.1', '1.5" (38.1 mm)'], ['44.45', '1.75" (44.45 mm) — most common'], ['50.8', '2" (50.8 mm)'],
+    ['40', '40 mm'], ['45', '45 mm'], ['50', '50 mm'], ['60', '60 mm'],
+  ];
+  /* [label, wMM, hMM, cornerRMM] — engraving-blank staples */
+  const CARD_SIZES = [
+    ['Credit-card blank — 85.6 × 54 mm (CR80)', 85.6, 54, 3.18],
+    ['US business card — 88.9 × 50.8 mm', 88.9, 50.8, 3],
+    ['EU business card — 85 × 55 mm', 85, 55, 3],
+    ['Dog tag — 50.8 × 28.6 mm', 50.8, 28.6, 6],
+    ['Key fob — 76.2 × 25.4 mm', 76.2, 25.4, 4],
+  ];
+
   function newCoinDialog() {
-    const sizes = [
-      ['38.1', '1.5" (38.1 mm)'], ['44.45', '1.75" (44.45 mm) — most common'], ['50.8', '2" (50.8 mm)'],
-      ['40', '40 mm'], ['45', '45 mm'], ['50', '50 mm'], ['60', '60 mm'],
-    ];
-    let sel = '44.45';
+    let tab = 'coin';
+    let coinSel = '44.45';
+
     const modal = CF.ui.modal({
-      title: 'New coin', width: '430px', modal: true,
+      title: 'New design', width: '460px', modal: true,
       content: (b) => {
-        b.appendChild(U.el('label', { class: 'cf-field-label' }, 'Blank diameter'));
-        const selEl = U.el('select', { class: 'cf-input' });
-        for (const [v, label] of sizes) selEl.appendChild(U.el('option', { value: v, selected: v === sel ? '' : null }, label));
-        selEl.appendChild(U.el('option', { value: 'custom' }, 'Custom…'));
-        const custom = U.el('input', { class: 'cf-input', type: 'number', value: 45, min: 5, max: 300, step: 0.5, style: { display: 'none' } });
-        selEl.addEventListener('change', () => {
-          sel = selEl.value;
-          custom.style.display = sel === 'custom' ? '' : 'none';
-        });
-        b.appendChild(selEl);
-        b.appendChild(custom);
-        b._custom = custom;
+        const tabRow = U.el('div', { class: 'cf-btn-row' });
+        const bCoin = U.el('button', { class: 'cf-btn primary' }, '● Coin');
+        const bCard = U.el('button', { class: 'cf-btn' }, '▭ Card / Tag');
+        tabRow.appendChild(bCoin); tabRow.appendChild(bCard);
+        b.appendChild(tabRow);
+        const pane = U.el('div');
+        b.appendChild(pane);
+
+        const fields = {};
+        function buildPane() {
+          bCoin.classList.toggle('primary', tab === 'coin');
+          bCard.classList.toggle('primary', tab === 'card');
+          pane.innerHTML = '';
+          if (tab === 'coin') {
+            pane.appendChild(U.el('label', { class: 'cf-field-label' }, 'Blank diameter'));
+            const selEl = U.el('select', { class: 'cf-input' });
+            for (const [v, label] of COIN_SIZES) selEl.appendChild(U.el('option', { value: v, selected: v === coinSel ? '' : null }, label));
+            selEl.appendChild(U.el('option', { value: 'custom', selected: coinSel === 'custom' ? '' : null }, 'Custom…'));
+            const custom = U.el('input', { class: 'cf-input', type: 'number', value: 45, min: 5, max: 300, step: 0.5, style: { display: coinSel === 'custom' ? '' : 'none' } });
+            selEl.addEventListener('change', () => {
+              coinSel = selEl.value;
+              custom.style.display = coinSel === 'custom' ? '' : 'none';
+            });
+            pane.appendChild(selEl);
+            pane.appendChild(custom);
+            fields.coinCustom = custom;
+          } else {
+            pane.appendChild(U.el('label', { class: 'cf-field-label' }, 'Card blank'));
+            const selEl = U.el('select', { class: 'cf-input' });
+            CARD_SIZES.forEach(([label], i) => selEl.appendChild(U.el('option', { value: i }, label)));
+            pane.appendChild(selEl);
+            const dims = U.el('div', { class: 'cf-btn-row' });
+            const num = (val, min, max) => U.el('input', { class: 'cf-input', type: 'number', value: val, min, max, step: 0.1 });
+            const wIn = num(CARD_SIZES[0][1], 10, 300), hIn = num(CARD_SIZES[0][2], 10, 300), rIn = num(CARD_SIZES[0][3], 0, 20);
+            const dimField = (label, inp) => U.el('div', null, U.el('label', { class: 'cf-field-label' }, label), inp);
+            dims.appendChild(dimField('Width mm', wIn));
+            dims.appendChild(dimField('Height mm', hIn));
+            dims.appendChild(dimField('Corner mm', rIn));
+            pane.appendChild(dims);
+            selEl.addEventListener('change', () => {
+              const [, w, h, r] = CARD_SIZES[parseInt(selEl.value, 10)];
+              wIn.value = w; hIn.value = h; rIn.value = r;
+            });
+            pane.appendChild(U.el('p', { class: 'cf-hint' }, 'Single-side engraving. Anodized aluminum, brass, wood and acrylic blanks all work — dark marks on light material.'));
+            fields.w = wIn; fields.h = hIn; fields.r = rIn;
+          }
+        }
+        bCoin.addEventListener('click', () => { tab = 'coin'; buildPane(); });
+        bCard.addEventListener('click', () => { tab = 'card'; buildPane(); });
+        buildPane();
+        b._fields = fields;
       },
       buttons: [
         { label: 'Cancel', onClick: m => m.close() },
         {
           label: 'Create', primary: true, onClick: m => {
-            const D = sel === 'custom' ? U.clamp(parseFloat(m.body._custom.value) || 45, 5, 300) : parseFloat(sel);
+            const f = m.body._fields;
             m.close();
-            S().newDoc(D);
+            if (tab === 'coin') {
+              const D = coinSel === 'custom' ? U.clamp(parseFloat(f.coinCustom.value) || 45, 5, 300) : parseFloat(coinSel);
+              S().newDoc(D);
+            } else {
+              const wMM = U.clamp(parseFloat(f.w.value) || 85.6, 10, 300);
+              const hMM = U.clamp(parseFloat(f.h.value) || 54, 10, 300);
+              const cornerRMM = U.clamp(parseFloat(f.r.value) || 0, 0, Math.min(wMM, hMM) / 2);
+              S().newDoc({ kind: cornerRMM > 0 ? 'rounded' : 'rect', wMM, hMM, cornerRMM, marginMM: 4 });
+            }
             CF.renderer.fit();
           }
         }
@@ -290,7 +348,7 @@
   async function openManager() {
     const modal = CF.ui.modal({ title: 'Projects', width: '860px' });
     const bar = U.el('div', { class: 'cf-btn-row' });
-    const bNew = U.el('button', { class: 'cf-btn primary' }, '+ New coin');
+    const bNew = U.el('button', { class: 'cf-btn primary' }, '+ New design');
     bNew.addEventListener('click', () => { modal.close(); newCoinDialog(); });
     const bImport = U.el('button', { class: 'cf-btn' }, 'Import .coin file…');
     bImport.addEventListener('click', () => { modal.close(); importCoinFile(); });
