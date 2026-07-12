@@ -27,17 +27,22 @@
   let transientPre = null;
 
   /* spec: number = circle diameter (legacy callers), or a substrate object
-     {kind:'circle'|'rect'|'rounded', diameterMM | wMM/hMM(/cornerRMM), marginMM} */
+     {kind:'circle'|'rect'|'rounded'|'shape', diameterMM | wMM/hMM(/cornerRMM/shape),
+      marginMM, material?: 'metal'|'rubber'} */
   S.newDoc = function (spec = 44.45, name) {
+    const material = (typeof spec === 'object' && spec.material) || 'metal';
     const sub = typeof spec === 'number'
       ? { kind: 'circle', diameterMM: spec, marginMM: 2 }
       : Object.assign({ marginMM: spec.kind === 'circle' ? 2 : 4 }, spec);
+    delete sub.material;
     S.doc = {
       version: 2,
       id: U.uid(),
-      name: name || (sub.kind === 'circle' ? 'Untitled Coin' : sub.kind === 'shape' ? 'Untitled Token' : 'Untitled Card'),
+      name: name || (material === 'rubber' ? 'Untitled Stamp'
+        : sub.kind === 'circle' ? 'Untitled Coin' : sub.kind === 'shape' ? 'Untitled Token' : 'Untitled Card'),
       author: CF.AUTHOR,
       substrate: sub,
+      material,
       dpi: 1016,
       groups: [],
       elements: []

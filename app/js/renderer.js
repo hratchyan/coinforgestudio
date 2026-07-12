@@ -19,6 +19,9 @@
     bronze: { label: 'Antique Bronze', hi: '#e6c896', mid: '#9c7a3c', lo: '#57431c', rim: '#3d2f12', text: '#2b210d' },
     black: { label: 'Matte Black', hi: '#4a4a4a', mid: '#282828', lo: '#111111', rim: '#000000', text: '#e8e8e8' },
     gunmetal: { label: 'Gunmetal', hi: '#9aa2ac', mid: '#5a626e', lo: '#2e343c', rim: '#1c2026', text: '#dfe3e8' },
+    /* not a metal — the stamp-die look for doc.material === 'rubber';
+       kept out of the metal-preview dropdown (inspector filters it) */
+    rubber: { label: 'Rubber (stamp die)', hi: '#f0b3a0', mid: '#dd8f78', lo: '#a75b46', rim: '#7d4234', text: '#3a1f16' },
   };
 
   const R = { canvas: null, ctx: null, basePx: 4, hoverId: null };
@@ -307,7 +310,7 @@
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, W, H);
 
-    R.drawBlank(ctx, doc, cx, cy, s, ui.metal);
+    R.drawBlank(ctx, doc, cx, cy, s, doc.material === 'rubber' ? 'rubber' : ui.metal);
 
     /* art */
     const pad = 1.5;
@@ -526,7 +529,7 @@
     const sub = CF.substrate.get(doc);
     ctx.fillStyle = '#1b1e24';
     ctx.fillRect(0, 0, sizePx, sizePx);
-    const metal = metalId || (CF.store.ui ? CF.store.ui.metal : 'brass');
+    const metal = metalId || (doc.material === 'rubber' ? 'rubber' : (CF.store.ui ? CF.store.ui.metal : 'brass'));
     const pxPerMM = (rPx * 2) / CF.substrate.maxDimMM(doc);
     if (sub.kind === 'circle') {
       R.drawMetal(ctx, sizePx / 2, sizePx / 2, rPx, metal);

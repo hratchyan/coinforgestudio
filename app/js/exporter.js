@@ -60,7 +60,7 @@
     return out;
   }
 
-  function buildSVG(doc, { includeOutline = true, background = 'none', colorMap = false } = {}) {
+  function buildSVG(doc, { includeOutline = true, background = 'none', colorMap = false, mirror = false } = {}) {
     const sub = CF.substrate.get(doc);
     const { w: W, h: H } = CF.substrate.sizeMM(doc);
     const hw = W / 2, hh = H / 2;
@@ -79,9 +79,14 @@
       : sub.kind === 'shape'
         ? `<path d="${CF.substrate.svgPath(doc)}"/>`
         : `<rect x="${U.num(-hw)}" y="${U.num(-hh)}" width="${U.num(W)}" height="${U.num(H)}"${rx ? ` rx="${U.num(rx)}"` : ''}/>`;
-    s += `<clipPath id="coin">${clipShape}</clipPath>\n<g clip-path="url(#coin)">\n`;
+    /* mirror wraps the art only — every substrate outline is
+       horizontally symmetric, so the clip/outline stay unmirrored */
+    s += `<clipPath id="coin">${clipShape}</clipPath>\n`;
+    if (mirror) s += `<g transform="scale(-1 1)">\n`;
+    s += `<g clip-path="url(#coin)">\n`;
     for (const el of doc.elements) s += CF.Elements.toSVG(el, colorOf(el)) + '\n';
     s += `</g>\n`;
+    if (mirror) s += `</g>\n`;
     if (includeOutline) {
       const stroke = `fill="none" stroke="${colorMap ? '#00A0A0' : '#000'}" stroke-width="0.1"`;
       s += sub.kind === 'circle'
@@ -106,9 +111,12 @@
 
     open() {
       const doc = S().doc;
+      const isRubber = doc.material === 'rubber';
+      /* rubber die: invert (burn away background, keep art raised) and
+         mirror (die prints reversed) — the classic stamp-mode defaults */
       const st = {
-        format: 'png', dpi: doc.dpi || 1016, bg: 'white', invert: false,
-        mirror: false, outline: false, dither: 'none', threshold: 128,
+        format: 'png', dpi: doc.dpi || 1016, bg: 'white', invert: isRubber,
+        mirror: isRubber, outline: false, dither: 'none', threshold: 128,
         content: 'all', svgMode: 'art'
       };
       const buckets = groupBuckets(doc);
@@ -192,7 +200,11 @@
       };
       mkCheck('Invert (light marks on dark coating — negative art)', 'invert');
       mkCheck('Mirror horizontally', 'mirror');
-      mkCheck('Include coin outline circle (alignment/cut reference)', 'outline');
+      mkCheck('Include blank outline (alignment/cut reference)', 'outline');
+      if (isRubber) {
+        left.appendChild(U.el('p', { class: 'cf-hint' },
+          '◉ Stamp die defaults: mirrored + inverted so the raised art prints correctly. Turn both off only if your laser software applies its own stamp mode.'));
+      }
 
       left.appendChild(U.el('p', { class: 'cf-hint' },
         'Per-group PNGs share identical canvas size and center, so they align 1:1 in your laser software — set different power/speed per file. The red cut outline never rasterizes; it exports in SVG (red) or via Tools → Generate Cut Outline.'));
@@ -248,7 +260,8 @@
           const svg = buildSVG(doc, {
             includeOutline: st.outline,
             background: st.bg === 'white' ? 'white' : 'none',
-            colorMap: st.svgMode === 'layers'
+            colorMap: st.svgMode === 'layers',
+            mirror: st.mirror
           });
           await saveBlob(fileBase() + (st.svgMode === 'layers' ? '-layers.svg' : '.svg'), new Blob([svg], { type: 'image/svg+xml' }));
           return;

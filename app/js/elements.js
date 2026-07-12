@@ -653,6 +653,48 @@
     ]
   };
 
+  /* ---------- rectangular frame (stamp & card borders) ---------- */
+  H.frame = {
+    label: 'Frame',
+    defaults: () => ({ wMM: 40, hMM: 20, thicknessMM: 0.8, cornerRMM: 1, style: 'solid' }),
+    render(ctx, el) {
+      const draw = (w, h, r, lw) => {
+        if (w <= 0 || h <= 0) return;
+        ctx.lineWidth = lw;
+        ctx.beginPath();
+        if (r > 0) ctx.roundRect(-w / 2, -h / 2, w, h, Math.min(r, Math.min(w, h) / 2));
+        else ctx.rect(-w / 2, -h / 2, w, h);
+        ctx.stroke();
+      };
+      const t = el.thicknessMM || 0.8;
+      draw(el.wMM, el.hMM, el.cornerRMM || 0, t);
+      if (el.style === 'double') {
+        const g = t * 2.4;
+        draw(el.wMM - g * 2, el.hMM - g * 2, Math.max(0, (el.cornerRMM || 0) - g), t * 0.55);
+      }
+    },
+    bounds(el) { return { w: el.wMM + (el.thicknessMM || 0.8), h: el.hMM + (el.thicknessMM || 0.8) }; },
+    scaleBy(el, f) { el.wMM = Math.max(2, el.wMM * f); el.hMM = Math.max(2, el.hMM * f); },
+    toSVG(el, fill) {
+      const rect = (w, h, r, sw) => (w <= 0 || h <= 0) ? '' :
+        `<rect x="${num(-w / 2)}" y="${num(-h / 2)}" width="${num(w)}" height="${num(h)}"${r > 0 ? ` rx="${num(Math.min(r, Math.min(w, h) / 2))}"` : ''} fill="none" stroke="${fill}" stroke-width="${num(sw)}"/>`;
+      const t = el.thicknessMM || 0.8;
+      let s = rect(el.wMM, el.hMM, el.cornerRMM || 0, t);
+      if (el.style === 'double') {
+        const g = t * 2.4;
+        s += rect(el.wMM - g * 2, el.hMM - g * 2, Math.max(0, (el.cornerRMM || 0) - g), t * 0.55);
+      }
+      return s;
+    },
+    inspector: [
+      { key: 'wMM', label: 'Width', kind: 'number', min: 2, max: 300, step: 0.5, unit: 'mm' },
+      { key: 'hMM', label: 'Height', kind: 'number', min: 2, max: 300, step: 0.5, unit: 'mm' },
+      { key: 'thicknessMM', label: 'Line thickness', kind: 'number', min: 0.1, max: 5, step: 0.05, unit: 'mm' },
+      { key: 'cornerRMM', label: 'Corner radius', kind: 'number', min: 0, max: 20, step: 0.25, unit: 'mm' },
+      { key: 'style', label: 'Style', kind: 'select', options: [['solid', 'Single line'], ['double', 'Double line']] },
+    ]
+  };
+
   /* ---------- QR code (generated fully offline by qr.js) ---------- */
   H.qr = {
     label: 'QR Code',

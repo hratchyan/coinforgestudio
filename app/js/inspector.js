@@ -296,19 +296,33 @@
     mInp.addEventListener('change', () => S().mutate(d => { d.substrate.marginMM = U.clamp(parseFloat(mInp.value) || 0, 0, 15); }));
     frag.appendChild(fieldRow('Safe margin (guide)', U.el('div', { class: 'cf-num-wrap' }, mInp, U.el('span', { class: 'cf-unit' }, 'mm'))));
 
-    /* metal preview */
-    const metalSel = U.el('select', { class: 'cf-input' });
-    for (const [id, m] of Object.entries(CF.renderer.metals)) {
-      metalSel.appendChild(U.el('option', { value: id, selected: S().ui.metal === id ? '' : null }, m.label));
-    }
-    metalSel.addEventListener('change', () => S().setUI({ metal: metalSel.value }));
-    frag.appendChild(fieldRow('Metal preview', metalSel));
+    /* material */
+    const isRubber = doc.material === 'rubber';
+    const matSel = U.el('select', { class: 'cf-input' },
+      U.el('option', { value: 'metal', selected: !isRubber ? '' : null }, 'Metal / hard surface (engraved marks)'),
+      U.el('option', { value: 'rubber', selected: isRubber ? '' : null }, 'Rubber stamp (raised die)'));
+    matSel.addEventListener('change', () => { S().mutate(d => { d.material = matSel.value; }); render(); });
+    frag.appendChild(fieldRow('Material', matSel));
 
-    const markSel = U.el('select', { class: 'cf-input' },
-      U.el('option', { value: 'dark', selected: !S().ui.markLight ? '' : null }, 'Dark marks (bare metal, steel, brass)'),
-      U.el('option', { value: 'light', selected: S().ui.markLight ? '' : null }, 'Light marks (anodized / coated / painted)'));
-    markSel.addEventListener('change', () => S().setUI({ markLight: markSel.value === 'light' }));
-    frag.appendChild(fieldRow('Laser mark appears as', markSel));
+    if (isRubber) {
+      frag.appendChild(U.el('p', { class: 'cf-hint' },
+        'Stamp die: design reads normally here — the export is mirrored and inverted so the raised art prints correctly.'));
+    } else {
+      /* metal preview */
+      const metalSel = U.el('select', { class: 'cf-input' });
+      for (const [id, m] of Object.entries(CF.renderer.metals)) {
+        if (id === 'rubber') continue; /* material, not a metal finish */
+        metalSel.appendChild(U.el('option', { value: id, selected: S().ui.metal === id ? '' : null }, m.label));
+      }
+      metalSel.addEventListener('change', () => S().setUI({ metal: metalSel.value }));
+      frag.appendChild(fieldRow('Metal preview', metalSel));
+
+      const markSel = U.el('select', { class: 'cf-input' },
+        U.el('option', { value: 'dark', selected: !S().ui.markLight ? '' : null }, 'Dark marks (bare metal, steel, brass)'),
+        U.el('option', { value: 'light', selected: S().ui.markLight ? '' : null }, 'Light marks (anodized / coated / painted)'));
+      markSel.addEventListener('change', () => S().setUI({ markLight: markSel.value === 'light' }));
+      frag.appendChild(fieldRow('Laser mark appears as', markSel));
+    }
 
     const relief = U.el('input', { type: 'checkbox' });
     relief.checked = S().ui.relief;
@@ -320,7 +334,7 @@
       U.el('label', { class: 'cf-check-label' }, relief, ' Relief preview'),
       U.el('label', { class: 'cf-check-label' }, guides, ' Guides')));
 
-    return section(isRound ? 'Coin' : sub.kind === 'shape' ? 'Token' : 'Card', frag);
+    return section(isRubber ? 'Stamp' : isRound ? 'Coin' : sub.kind === 'shape' ? 'Token' : 'Card', frag);
   }
 
   /* ---------- align to blank (safe-margin box) ---------- */

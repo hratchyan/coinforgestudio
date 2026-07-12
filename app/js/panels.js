@@ -119,6 +119,13 @@
       btn('◎', 'Ring Band', () => S().addElement(CF.Elements.create('ringband', { radiusMM: R() - 2, thicknessMM: 1.2 })));
     }
     btn('⌢', 'Banner', () => S().addElement(CF.Elements.create('banner', { wMM: R() * 1.15, hMM: R() * 0.16, sizeMM: R() * 0.1, y: R() * 0.55 })));
+    if (!isRound) {
+      btn('▢', 'Frame', () => {
+        const { w, h } = CF.substrate.sizeMM(S().doc);
+        const m = CF.substrate.marginMM(S().doc) || 3;
+        S().addElement(CF.Elements.create('frame', { wMM: w - m * 2, hMM: h - m * 2, cornerRMM: 1 }));
+      }, 'Rectangular border sized to the blank');
+    }
     btn('▣', 'Image', () => CF.flows.addImage(), 'Import a photo — background removal & smart fit included');
     btn('★', 'Shape', () => S().addElement(CF.Elements.create('shape', { sizeMM: R() * 0.5 })));
     btn('▦', 'QR Code', () => S().addElement(CF.Elements.create('qr', { sizeMM: Math.min(R() * 0.55, 20) })),

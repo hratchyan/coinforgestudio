@@ -274,7 +274,8 @@
         const bCoin = U.el('button', { class: 'cf-btn primary' }, '● Coin');
         const bCard = U.el('button', { class: 'cf-btn' }, '▭ Card / Tag');
         const bToken = U.el('button', { class: 'cf-btn' }, '⬡ Token');
-        tabRow.appendChild(bCoin); tabRow.appendChild(bCard); tabRow.appendChild(bToken);
+        const bStamp = U.el('button', { class: 'cf-btn' }, '◉ Stamp');
+        tabRow.appendChild(bCoin); tabRow.appendChild(bCard); tabRow.appendChild(bToken); tabRow.appendChild(bStamp);
         b.appendChild(tabRow);
         const pane = U.el('div');
         b.appendChild(pane);
@@ -284,6 +285,7 @@
           bCoin.classList.toggle('primary', tab === 'coin');
           bCard.classList.toggle('primary', tab === 'card');
           bToken.classList.toggle('primary', tab === 'token');
+          bStamp.classList.toggle('primary', tab === 'stamp');
           pane.innerHTML = '';
           if (tab === 'coin') {
             pane.appendChild(U.el('label', { class: 'cf-field-label' }, 'Blank diameter'));
@@ -320,6 +322,33 @@
             pane.appendChild(U.el('p', { class: 'cf-hint' },
               'Shaped metal blanks — hex tool tokens, crests, keepsakes. The safe-margin guide is approximate near curved edges.'));
             fields.shape = selEl; fields.tw = wIn; fields.th = hIn;
+          } else if (tab === 'stamp') {
+            pane.appendChild(U.el('label', { class: 'cf-field-label' }, 'Stamp die size'));
+            const STAMPS = [ /* [label, kind, wMM, hMM] */
+              ['Address block — 58 × 22 mm', 'rect', 58, 22],
+              ['Line stamp — 47 × 18 mm', 'rect', 47, 18],
+              ['Small line — 38 × 14 mm', 'rect', 38, 14],
+              ['Square — 40 × 40 mm', 'rect', 40, 40],
+              ['Round — Ø 40 mm', 'circle', 40, 40],
+              ['Round — Ø 30 mm', 'circle', 30, 30],
+            ];
+            const selEl = U.el('select', { class: 'cf-input' });
+            STAMPS.forEach(([label], i) => selEl.appendChild(U.el('option', { value: i }, label)));
+            pane.appendChild(selEl);
+            const dims = U.el('div', { class: 'cf-btn-row' });
+            const num = (val, min, max) => U.el('input', { class: 'cf-input', type: 'number', value: val, min, max, step: 0.5 });
+            const wIn = num(STAMPS[0][2], 10, 300), hIn = num(STAMPS[0][3], 10, 300);
+            const dimField = (label, inp) => U.el('div', null, U.el('label', { class: 'cf-field-label' }, label), inp);
+            dims.appendChild(dimField('Width mm', wIn));
+            dims.appendChild(dimField('Height mm', hIn));
+            pane.appendChild(dims);
+            selEl.addEventListener('change', () => {
+              const [, , w, h] = STAMPS[parseInt(selEl.value, 10)];
+              wIn.value = w; hIn.value = h;
+            });
+            pane.appendChild(U.el('p', { class: 'cf-hint' },
+              'Rubber die: design reads normally in the editor — export flips and inverts it so the raised art prints correctly. Round dies support ring presets and arc text.'));
+            fields.stamp = STAMPS; fields.stampSel = selEl; fields.sw = wIn; fields.sh = hIn;
           } else {
             pane.appendChild(U.el('label', { class: 'cf-field-label' }, 'Card blank'));
             const selEl = U.el('select', { class: 'cf-input' });
@@ -344,6 +373,7 @@
         bCoin.addEventListener('click', () => { tab = 'coin'; buildPane(); });
         bCard.addEventListener('click', () => { tab = 'card'; buildPane(); });
         bToken.addEventListener('click', () => { tab = 'token'; buildPane(); });
+        bStamp.addEventListener('click', () => { tab = 'stamp'; buildPane(); });
         buildPane();
         b._fields = fields;
       },
@@ -360,6 +390,13 @@
               const wMM = U.clamp(parseFloat(f.tw.value) || 40, 10, 300);
               const hMM = U.clamp(parseFloat(f.th.value) || 35, 10, 300);
               S().newDoc({ kind: 'shape', shape: f.shape.value, wMM, hMM, marginMM: 3 });
+            } else if (tab === 'stamp') {
+              const kind = f.stamp[parseInt(f.stampSel.value, 10)][1];
+              const wMM = U.clamp(parseFloat(f.sw.value) || 47, 10, 300);
+              const hMM = U.clamp(parseFloat(f.sh.value) || 18, 10, 300);
+              S().newDoc(kind === 'circle'
+                ? { kind: 'circle', diameterMM: wMM, marginMM: 2, material: 'rubber' }
+                : { kind: 'rect', wMM, hMM, marginMM: 3, material: 'rubber' });
             } else {
               const wMM = U.clamp(parseFloat(f.w.value) || 85.6, 10, 300);
               const hMM = U.clamp(parseFloat(f.h.value) || 54, 10, 300);

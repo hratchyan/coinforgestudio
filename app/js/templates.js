@@ -34,6 +34,13 @@
     };
   }
 
+  function stampDoc(name, sub, elements) {
+    return {
+      version: 3, id: CF.util.uid(), name, author: CF.AUTHOR,
+      substrate: sub, material: 'rubber', dpi: 1016, elements
+    };
+  }
+
   const ring = (id, R) => CF.RingPresets.get(id).build(R);
 
   const TEMPLATES = [
@@ -355,6 +362,45 @@
         return tokenDoc('Bone Tag', 'bone', W, H, [
           E().create('text', { name: 'Name', text: 'LUNA', weight: 700, sizeMM: 5.5, y: -H * 0.09 }),
           E().create('text', { name: 'Phone', text: '+1 (555) 123-4567', sizeMM: 2.1, y: H * 0.14 }),
+        ]);
+      }
+    },
+    {
+      id: 'stamp-address', label: 'Address Stamp', cat: 'Stamps',
+      desc: 'Three-line return address with a double border — 58 × 22 mm die.',
+      build() {
+        const W = 58, H = 22;
+        return stampDoc('Address Stamp', { kind: 'rect', wMM: W, hMM: H, marginMM: 3 }, [
+          E().create('frame', { name: 'Border', wMM: W - 5, hMM: H - 5, thicknessMM: 0.6, cornerRMM: 1.5, style: 'double' }),
+          E().create('text', { name: 'Name', text: 'YOUR NAME', weight: 700, sizeMM: 3.6, y: -H * 0.21 }),
+          E().create('text', { name: 'Street', text: '123 Main Street', sizeMM: 2.9, y: 0 }),
+          E().create('text', { name: 'City', text: 'City, ST 00000', sizeMM: 2.9, y: H * 0.21 }),
+        ]);
+      }
+    },
+    {
+      id: 'stamp-round', label: 'Round Company Stamp', cat: 'Stamps',
+      desc: 'Classic round seal — arc text, star separators, centered line.',
+      build() {
+        const D = 40, R = D / 2;
+        return stampDoc('Round Stamp', { kind: 'circle', diameterMM: D, marginMM: 2 }, [
+          E().create('ringband', { name: 'Outer ring', style: 'double', radiusMM: R - 1.6, thicknessMM: 1.1 }),
+          E().create('arctext', { name: 'Top text', text: 'YOUR COMPANY NAME', radiusMM: R - 4.6, sizeMM: 2.7, side: 'top', letterSpacing: 0.35 }),
+          E().create('arctext', { name: 'Bottom text', text: 'CITY · COUNTRY', radiusMM: R - 4.6, sizeMM: 2.7, side: 'bottom', centerDeg: 180, letterSpacing: 0.35 }),
+          E().create('symbolring', { name: 'Separators', symbolId: 'star5', count: 2, radiusMM: R - 5.4, itemSizeMM: 2.2, startDeg: 90, sweepDeg: 360, rotateItems: false }),
+          E().create('text', { name: 'Center', text: 'OFFICIAL', weight: 700, sizeMM: 3.4 }),
+        ]);
+      }
+    },
+    {
+      id: 'stamp-received', label: 'RECEIVED Stamp', cat: 'Stamps',
+      desc: 'Office stamp with a date line — 47 × 18 mm die.',
+      build() {
+        const W = 47, H = 18;
+        return stampDoc('Received Stamp', { kind: 'rect', wMM: W, hMM: H, marginMM: 2.5 }, [
+          E().create('frame', { name: 'Border', wMM: W - 4, hMM: H - 4, thicknessMM: 0.7, cornerRMM: 1 }),
+          E().create('text', { name: 'Label', text: 'RECEIVED', weight: 700, sizeMM: 4.4, y: -H * 0.14 }),
+          E().create('text', { name: 'Date line', text: 'DATE: ____________', sizeMM: 2.5, y: H * 0.2 }),
         ]);
       }
     },

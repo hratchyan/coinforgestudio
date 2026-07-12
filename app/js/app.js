@@ -111,9 +111,10 @@
     const updDoc = () => {
       if (!S().doc) return;
       const sub = CF.substrate.get(S().doc);
-      docInfo.textContent = sub.kind === 'circle'
+      const matTag = S().doc.material === 'rubber' ? ' · rubber stamp' : '';
+      docInfo.textContent = (sub.kind === 'circle'
         ? `${S().doc.name} — ⌀ ${U.round(sub.diameterMM, 2)} mm (${U.round(U.mm2in(sub.diameterMM), 3)}")`
-        : `${S().doc.name} — ${U.round(sub.wMM, 2)} × ${U.round(sub.hMM, 2)} mm`;
+        : `${S().doc.name} — ${U.round(sub.wMM, 2)} × ${U.round(sub.hMM, 2)} mm`) + matTag;
       const sels = S().selEls();
       selInfo.textContent = sels.length === 1
         ? `${CF.Elements.handlers[sels[0].type].label}: ${sels[0].name || ''}`
