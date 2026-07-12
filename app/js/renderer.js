@@ -488,7 +488,7 @@
       ctx.beginPath();
       ctx.arc(side / 2, side / 2, side / 2, 0, Math.PI * 2);
       ctx.clip();
-    } else if (sub.kind === 'rounded') {
+    } else if (sub.kind !== 'rect') { /* rounded + shaped tokens */
       CF.substrate.trace(ctx, doc, side / 2, sideH / 2, pxPerMM);
       ctx.clip();
     }

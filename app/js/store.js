@@ -35,7 +35,7 @@
     S.doc = {
       version: 2,
       id: U.uid(),
-      name: name || (sub.kind === 'circle' ? 'Untitled Coin' : 'Untitled Card'),
+      name: name || (sub.kind === 'circle' ? 'Untitled Coin' : sub.kind === 'shape' ? 'Untitled Token' : 'Untitled Card'),
       author: CF.AUTHOR,
       substrate: sub,
       dpi: 1016,

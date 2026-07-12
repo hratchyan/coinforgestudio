@@ -94,7 +94,8 @@
   /* ============ Add tab ============ */
   function buildAdd(pane) {
     pane.innerHTML = '';
-    const isRound = CF.substrate.kind(S().doc) === 'circle';
+    const kind = CF.substrate.kind(S().doc);
+    const isRound = kind === 'circle';
     const R = () => CF.substrate.maxDimMM(S().doc) / 2;
     const CH = () => CF.substrate.sizeMM(S().doc).h; /* card height for stacking */
     const year = String(new Date().getFullYear());
@@ -141,6 +142,13 @@
       qbtn('Aa', 'Signature', () => S().addElement(CF.Elements.create('text', { name: 'Signature', text: 'Your Name', font: CF.Fonts.defaultScript(), weight: 400, sizeMM: R() * 0.2, y: R() * 0.35 })));
       qbtn('M', 'Mint Mark', () => S().addElement(CF.Elements.create('text', { name: 'Mint mark', text: 'M', weight: 700, sizeMM: R() * 0.1, x: R() * 0.55, y: R() * 0.55 })));
       qbtn('#', 'Serial No.', () => S().addElement(CF.Elements.create('text', { name: 'Serial', text: 'No. 0001', font: 'Special Elite', weight: 400, sizeMM: R() * 0.09, y: R() * 0.72 })));
+    } else if (kind === 'shape') {
+      /* token quick-adds — coin-style features, no ring geometry */
+      const txt = (name, text, opts) => S().addElement(CF.Elements.create('text', Object.assign({ name, text }, opts)));
+      qbtn(year.slice(2), 'Year', () => txt('Year', year, { weight: 700, sizeMM: R() * 0.14, y: R() * 0.45 }));
+      qbtn('Aa', 'Signature', () => txt('Signature', 'Your Name', { font: CF.Fonts.defaultScript(), weight: 400, sizeMM: R() * 0.18, y: R() * 0.3 }));
+      qbtn('“', 'Motto Banner', () => S().addElement(CF.Elements.create('banner', { name: 'Motto', text: 'YOUR MOTTO', wMM: R() * 1.1, hMM: R() * 0.15, sizeMM: R() * 0.09, curveDeg: 40, y: R() * 0.5 })));
+      qbtn('#', 'Serial No.', () => txt('Serial', 'No. 0001', { font: 'Special Elite', weight: 400, sizeMM: R() * 0.08, y: R() * 0.62 }));
     } else {
       /* contact quick-adds for cards & tags */
       const txt = (name, text, opts) => S().addElement(CF.Elements.create('text', Object.assign({ name, text }, opts)));

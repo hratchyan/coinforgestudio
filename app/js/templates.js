@@ -26,6 +26,14 @@
     };
   }
 
+  function tokenDoc(name, shape, wMM, hMM, elements) {
+    return {
+      version: 3, id: CF.util.uid(), name, author: CF.AUTHOR,
+      substrate: { kind: 'shape', shape, wMM, hMM, marginMM: 3 },
+      dpi: 1016, elements
+    };
+  }
+
   const ring = (id, R) => CF.RingPresets.get(id).build(R);
 
   const TEMPLATES = [
@@ -301,6 +309,52 @@
         return cardDoc('Pet Tag', W, H, 6, [
           E().create('text', { name: 'Name', text: 'LUNA', weight: 700, sizeMM: 8, y: -H * 0.13 }),
           E().create('text', { name: 'Phone', text: 'IF FOUND: +1 (555) 123-4567', sizeMM: 1.9, y: H * 0.24 }),
+        ]);
+      }
+    },
+    {
+      id: 'token-hex', label: 'Hex Maker Token', cat: 'Tokens',
+      desc: 'Workshop hex token — gear center, bold wordmark.',
+      build() {
+        const W = 38.1, H = 33;
+        return tokenDoc('Hex Token', 'hexagon', W, H, [
+          E().create('text', { name: 'Top', text: 'MAKER', weight: 700, sizeMM: 4.4, y: -H * 0.3 }),
+          E().create('shape', { name: 'Gear', kind: 'gear', params: { teeth: 12, depthPct: 18, holePct: 34 }, sizeMM: H * 0.42, y: 0 }),
+          E().create('text', { name: 'Bottom', text: String(new Date().getFullYear()), weight: 700, sizeMM: 4, y: H * 0.32 }),
+        ]);
+      }
+    },
+    {
+      id: 'token-shield', label: 'Shield Crest', cat: 'Tokens',
+      desc: 'Crest blank — initials up top, motto banner below.',
+      build() {
+        const W = 45, H = 55;
+        return tokenDoc('Shield Crest', 'shield', W, H, [
+          E().create('text', { name: 'Initials', text: 'HS', weight: 700, sizeMM: 15, y: -H * 0.16 }),
+          E().create('shape', { name: 'Divider', kind: 'line', params: { thickPct: 6 }, sizeMM: W * 0.5, y: H * 0.05 }),
+          E().create('banner', { name: 'Motto', text: 'FORTITUDO', wMM: W * 0.55, hMM: H * 0.09, sizeMM: H * 0.05, curveDeg: 30, y: H * 0.18 }),
+        ]);
+      }
+    },
+    {
+      id: 'token-heart', label: 'Heart Keepsake', cat: 'Tokens',
+      desc: 'Heart blank — two names and a date.',
+      build() {
+        const W = 45, H = 40;
+        return tokenDoc('Heart Keepsake', 'heart', W, H, [
+          E().create('text', { name: 'Names', text: 'A + H', weight: 700, sizeMM: 7, y: -H * 0.12 }),
+          E().create('text', { name: 'Date', text: '06 · 12 · ' + String(new Date().getFullYear()), sizeMM: 3, y: H * 0.05 }),
+        ]);
+      }
+    },
+    {
+      id: 'token-bone', label: 'Bone Pet Tag', cat: 'Tokens',
+      desc: 'Classic dog-bone tag — name and phone number.',
+      build() {
+        const W = 70, H = 22;
+        return tokenDoc('Bone Tag', 'bone', W, H, [
+          E().create('text', { name: 'Name', text: 'LUNA', weight: 700, sizeMM: 5.5, y: -H * 0.09 }),
+          E().create('text', { name: 'Phone', text: '+1 (555) 123-4567', sizeMM: 2.1, y: H * 0.14 }),
         ]);
       }
     },

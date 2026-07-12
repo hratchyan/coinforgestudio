@@ -76,7 +76,9 @@
     if (background === 'white') s += `<rect x="${U.num(-hw)}" y="${U.num(-hh)}" width="${U.num(W)}" height="${U.num(H)}" fill="#ffffff"/>\n`;
     const clipShape = sub.kind === 'circle'
       ? `<circle cx="0" cy="0" r="${U.num(hw)}"/>`
-      : `<rect x="${U.num(-hw)}" y="${U.num(-hh)}" width="${U.num(W)}" height="${U.num(H)}"${rx ? ` rx="${U.num(rx)}"` : ''}/>`;
+      : sub.kind === 'shape'
+        ? `<path d="${CF.substrate.svgPath(doc)}"/>`
+        : `<rect x="${U.num(-hw)}" y="${U.num(-hh)}" width="${U.num(W)}" height="${U.num(H)}"${rx ? ` rx="${U.num(rx)}"` : ''}/>`;
     s += `<clipPath id="coin">${clipShape}</clipPath>\n<g clip-path="url(#coin)">\n`;
     for (const el of doc.elements) s += CF.Elements.toSVG(el, colorOf(el)) + '\n';
     s += `</g>\n`;
@@ -84,7 +86,9 @@
       const stroke = `fill="none" stroke="${colorMap ? '#00A0A0' : '#000'}" stroke-width="0.1"`;
       s += sub.kind === 'circle'
         ? `<circle cx="0" cy="0" r="${U.num(hw - 0.05)}" ${stroke}/>\n`
-        : `<rect x="${U.num(-(hw - 0.05))}" y="${U.num(-(hh - 0.05))}" width="${U.num(W - 0.1)}" height="${U.num(H - 0.1)}"${rx ? ` rx="${U.num(Math.max(0, rx - 0.05))}"` : ''} ${stroke}/>\n`;
+        : sub.kind === 'shape'
+          ? `<path d="${CF.substrate.svgPath(doc, 0.05)}" ${stroke}/>\n`
+          : `<rect x="${U.num(-(hw - 0.05))}" y="${U.num(-(hh - 0.05))}" width="${U.num(W - 0.1)}" height="${U.num(H - 0.1)}"${rx ? ` rx="${U.num(Math.max(0, rx - 0.05))}"` : ''} ${stroke}/>\n`;
     }
     s += `</svg>`;
     return s;

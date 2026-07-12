@@ -262,7 +262,7 @@
       uSel.addEventListener('change', () => { S().setUI({ unit: uSel.value }); render(); });
       frag.appendChild(fieldRow('Coin diameter', U.el('div', { class: 'cf-num-wrap' }, dInp, uSel)));
     } else {
-      /* card dimensions */
+      /* card / token dimensions */
       const mkDim = (label, key, min, max) => {
         const inp = U.el('input', { class: 'cf-input', type: 'number', step: 0.5, min, max, value: U.round(sub[key] || 0, 2) });
         inp.addEventListener('change', () => {
@@ -276,9 +276,20 @@
         });
         frag.appendChild(fieldRow(label, U.el('div', { class: 'cf-num-wrap' }, inp, U.el('span', { class: 'cf-unit' }, 'mm'))));
       };
-      mkDim('Width', 'wMM', 10, 300);
-      mkDim('Height', 'hMM', 10, 300);
-      mkDim('Corner radius', 'cornerRMM', 0, 20);
+      if (sub.kind === 'shape') {
+        const shapeSel = U.el('select', { class: 'cf-input' });
+        for (const id of CF.substrate.shapeIds()) {
+          shapeSel.appendChild(U.el('option', { value: id, selected: sub.shape === id ? '' : null }, CF.substrate.shapeInfo(id).label));
+        }
+        shapeSel.addEventListener('change', () => { S().mutate(d => { d.substrate.shape = shapeSel.value; }); CF.renderer.fit(); });
+        frag.appendChild(fieldRow('Shape', shapeSel));
+        mkDim('Width', 'wMM', 10, 300);
+        mkDim('Height', 'hMM', 10, 300);
+      } else {
+        mkDim('Width', 'wMM', 10, 300);
+        mkDim('Height', 'hMM', 10, 300);
+        mkDim('Corner radius', 'cornerRMM', 0, 20);
+      }
     }
 
     const mInp = U.el('input', { class: 'cf-input', type: 'number', step: 0.25, min: 0, max: 15, value: sub.marginMM });
@@ -309,7 +320,7 @@
       U.el('label', { class: 'cf-check-label' }, relief, ' Relief preview'),
       U.el('label', { class: 'cf-check-label' }, guides, ' Guides')));
 
-    return section(isRound ? 'Coin' : 'Card', frag);
+    return section(isRound ? 'Coin' : sub.kind === 'shape' ? 'Token' : 'Card', frag);
   }
 
   /* ---------- align to blank (safe-margin box) ---------- */

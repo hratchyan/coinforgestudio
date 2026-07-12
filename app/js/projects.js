@@ -273,7 +273,8 @@
         const tabRow = U.el('div', { class: 'cf-btn-row' });
         const bCoin = U.el('button', { class: 'cf-btn primary' }, '● Coin');
         const bCard = U.el('button', { class: 'cf-btn' }, '▭ Card / Tag');
-        tabRow.appendChild(bCoin); tabRow.appendChild(bCard);
+        const bToken = U.el('button', { class: 'cf-btn' }, '⬡ Token');
+        tabRow.appendChild(bCoin); tabRow.appendChild(bCard); tabRow.appendChild(bToken);
         b.appendChild(tabRow);
         const pane = U.el('div');
         b.appendChild(pane);
@@ -282,6 +283,7 @@
         function buildPane() {
           bCoin.classList.toggle('primary', tab === 'coin');
           bCard.classList.toggle('primary', tab === 'card');
+          bToken.classList.toggle('primary', tab === 'token');
           pane.innerHTML = '';
           if (tab === 'coin') {
             pane.appendChild(U.el('label', { class: 'cf-field-label' }, 'Blank diameter'));
@@ -296,6 +298,28 @@
             pane.appendChild(selEl);
             pane.appendChild(custom);
             fields.coinCustom = custom;
+          } else if (tab === 'token') {
+            pane.appendChild(U.el('label', { class: 'cf-field-label' }, 'Token shape'));
+            const selEl = U.el('select', { class: 'cf-input' });
+            for (const id of CF.substrate.shapeIds()) {
+              selEl.appendChild(U.el('option', { value: id }, CF.substrate.shapeInfo(id).label));
+            }
+            pane.appendChild(selEl);
+            const dims = U.el('div', { class: 'cf-btn-row' });
+            const num = (val, min, max) => U.el('input', { class: 'cf-input', type: 'number', value: val, min, max, step: 0.5 });
+            const d0 = CF.substrate.shapeInfo(CF.substrate.shapeIds()[0]).defaultMM;
+            const wIn = num(d0[0], 10, 300), hIn = num(d0[1], 10, 300);
+            const dimField = (label, inp) => U.el('div', null, U.el('label', { class: 'cf-field-label' }, label), inp);
+            dims.appendChild(dimField('Width mm', wIn));
+            dims.appendChild(dimField('Height mm', hIn));
+            pane.appendChild(dims);
+            selEl.addEventListener('change', () => {
+              const dm = CF.substrate.shapeInfo(selEl.value).defaultMM;
+              wIn.value = dm[0]; hIn.value = dm[1];
+            });
+            pane.appendChild(U.el('p', { class: 'cf-hint' },
+              'Shaped metal blanks — hex tool tokens, crests, keepsakes. The safe-margin guide is approximate near curved edges.'));
+            fields.shape = selEl; fields.tw = wIn; fields.th = hIn;
           } else {
             pane.appendChild(U.el('label', { class: 'cf-field-label' }, 'Card blank'));
             const selEl = U.el('select', { class: 'cf-input' });
@@ -319,6 +343,7 @@
         }
         bCoin.addEventListener('click', () => { tab = 'coin'; buildPane(); });
         bCard.addEventListener('click', () => { tab = 'card'; buildPane(); });
+        bToken.addEventListener('click', () => { tab = 'token'; buildPane(); });
         buildPane();
         b._fields = fields;
       },
@@ -331,6 +356,10 @@
             if (tab === 'coin') {
               const D = coinSel === 'custom' ? U.clamp(parseFloat(f.coinCustom.value) || 45, 5, 300) : parseFloat(coinSel);
               S().newDoc(D);
+            } else if (tab === 'token') {
+              const wMM = U.clamp(parseFloat(f.tw.value) || 40, 10, 300);
+              const hMM = U.clamp(parseFloat(f.th.value) || 35, 10, 300);
+              S().newDoc({ kind: 'shape', shape: f.shape.value, wMM, hMM, marginMM: 3 });
             } else {
               const wMM = U.clamp(parseFloat(f.w.value) || 85.6, 10, 300);
               const hMM = U.clamp(parseFloat(f.h.value) || 54, 10, 300);
