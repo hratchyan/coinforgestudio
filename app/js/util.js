@@ -6,7 +6,7 @@
 'use strict';
 window.CF = window.CF || {};
 
-CF.VERSION = '1.6.0';
+CF.VERSION = '1.7.0-beta.1';
 CF.APP_NAME = 'CoinForge Studio';
 CF.AUTHOR = 'Hratch Simonyan';
 
