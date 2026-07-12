@@ -110,8 +110,10 @@
 
     const updDoc = () => {
       if (!S().doc) return;
-      const D = S().doc.coin.diameterMM;
-      docInfo.textContent = `${S().doc.name} — ⌀ ${U.round(D, 2)} mm (${U.round(U.mm2in(D), 3)}")`;
+      const sub = CF.substrate.get(S().doc);
+      docInfo.textContent = sub.kind === 'circle'
+        ? `${S().doc.name} — ⌀ ${U.round(sub.diameterMM, 2)} mm (${U.round(U.mm2in(sub.diameterMM), 3)}")`
+        : `${S().doc.name} — ${U.round(sub.wMM, 2)} × ${U.round(sub.hMM, 2)} mm`;
       const sels = S().selEls();
       selInfo.textContent = sels.length === 1
         ? `${CF.Elements.handlers[sels[0].type].label}: ${sels[0].name || ''}`

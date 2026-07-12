@@ -157,7 +157,8 @@
     apply(id) {
       const p = this.get(id);
       if (!p) return;
-      const R = CF.store.doc.coin.diameterMM / 2;
+      const R = CF.substrate.radiusMM(CF.store.doc);
+      if (R === null) { CF.ui.toast('Ring presets need a round blank', 2600, 'error'); return; }
       const els = p.build(R);
       CF.store.addElements(els);
       CF.ui.toast(`Added ring preset: ${p.label}`);

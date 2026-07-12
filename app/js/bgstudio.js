@@ -284,7 +284,7 @@
       const box = CF.Img.alphaBounds(res) || { x: 0, y: 0, w: W, h: H };
       const out = asIs ? res : CF.Img.crop(res, box, 0.03);
       const dataURL = out.toDataURL('image/png');
-      const D = S().doc.coin.diameterMM;
+      const D = CF.substrate.maxDimMM(S().doc);
 
       if (mode === 'element' && opts.elementId) {
         S().mutate(d => {

@@ -306,7 +306,7 @@
       if (!result) { info.textContent = 'Nothing visible to outline.'; return; }
       /* ghost art + outline */
       const artDoc = Object.assign({}, doc, { elements: doc.elements.filter(e => e.type !== 'outline' && e.visible) });
-      const pxPerMM = side / (doc.coin.diameterMM * 1.5);
+      const pxPerMM = side / (CF.substrate.maxDimMM(doc) * 1.5);
       const art = CF.renderer.renderArt(artDoc, pxPerMM, 1.5);
       ctx.globalAlpha = 0.45;
       ctx.drawImage(art, side / 2 - art.width / 2, side / 2 - art.height / 2);
@@ -319,11 +319,10 @@
       ctx.lineWidth = 1.6 / pxPerMM;
       ctx.stroke(new Path2D(result.d));
       ctx.restore();
-      /* coin edge reference */
+      /* blank edge reference */
       ctx.strokeStyle = 'rgba(94,197,255,0.4)';
       ctx.setLineDash([4, 4]);
-      ctx.beginPath();
-      ctx.arc(side / 2, side / 2, doc.coin.diameterMM / 2 * pxPerMM, 0, Math.PI * 2);
+      CF.substrate.trace(ctx, doc, side / 2, side / 2, pxPerMM);
       ctx.stroke();
       ctx.setLineDash([]);
       info.textContent = `${result.loops} path${result.loops === 1 ? '' : 's'} · spans ${U.round(result.bw, 1)} × ${U.round(result.bh, 1)} mm`;

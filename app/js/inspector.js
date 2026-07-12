@@ -168,7 +168,7 @@
       S().mutate(d => {
         const t = d.elements.find(x => x.id === el.id);
         if (!t) return;
-        const D = d.coin.diameterMM;
+        const D = CF.substrate.maxDimMM(d);
         t.x = 0; t.y = 0;
         const aspect = t.natH / t.natW;
         const target = D * 0.62;
@@ -243,7 +243,8 @@
     frag.appendChild(fieldRow('Project name', nameInp));
 
     /* diameter with unit toggle */
-    const dval = unit === 'in' ? U.round(U.mm2in(doc.coin.diameterMM), 3) : U.round(doc.coin.diameterMM, 2);
+    const sub = CF.substrate.get(doc);
+    const dval = unit === 'in' ? U.round(U.mm2in(sub.diameterMM), 3) : U.round(sub.diameterMM, 2);
     const dInp = U.el('input', { class: 'cf-input', type: 'number', step: unit === 'in' ? 0.005 : 0.5, min: 5, value: dval });
     const uSel = U.el('select', { class: 'cf-input cf-unit-sel' },
       U.el('option', { value: 'mm', selected: unit === 'mm' ? '' : null }, 'mm'),
@@ -252,14 +253,14 @@
       let v = parseFloat(dInp.value);
       if (isNaN(v) || v <= 0) return;
       const mm = S().ui.unit === 'in' ? U.in2mm(v) : v;
-      S().mutate(d => { d.coin.diameterMM = U.clamp(mm, 5, 300); });
+      S().mutate(d => { d.substrate.diameterMM = U.clamp(mm, 5, 300); });
       CF.renderer.fit();
     });
     uSel.addEventListener('change', () => { S().setUI({ unit: uSel.value }); render(); });
     frag.appendChild(fieldRow('Coin diameter', U.el('div', { class: 'cf-num-wrap' }, dInp, uSel)));
 
-    const mInp = U.el('input', { class: 'cf-input', type: 'number', step: 0.25, min: 0, max: 15, value: doc.coin.marginMM });
-    mInp.addEventListener('change', () => S().mutate(d => { d.coin.marginMM = U.clamp(parseFloat(mInp.value) || 0, 0, 15); }));
+    const mInp = U.el('input', { class: 'cf-input', type: 'number', step: 0.25, min: 0, max: 15, value: sub.marginMM });
+    mInp.addEventListener('change', () => S().mutate(d => { d.substrate.marginMM = U.clamp(parseFloat(mInp.value) || 0, 0, 15); }));
     frag.appendChild(fieldRow('Safe margin (guide)', U.el('div', { class: 'cf-num-wrap' }, mInp, U.el('span', { class: 'cf-unit' }, 'mm'))));
 
     /* metal preview */

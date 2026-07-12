@@ -61,8 +61,10 @@
   }
 
   function buildSVG(doc, { includeOutline = true, background = 'none', colorMap = false } = {}) {
-    const D = doc.coin.diameterMM;
-    const half = D / 2;
+    const sub = CF.substrate.get(doc);
+    const { w: W, h: H } = CF.substrate.sizeMM(doc);
+    const hw = W / 2, hh = H / 2;
+    const rx = sub.kind === 'rounded' ? (sub.cornerRMM || 0) : 0;
     const colorOf = (el) => {
       if (!colorMap || el.type === 'outline') return null;
       const g = (doc.groups || []).find(x => x.id === el.groupId);
@@ -70,12 +72,20 @@
     };
     let s = `<?xml version="1.0" encoding="UTF-8"?>\n`;
     s += `<!-- Made with ${CF.APP_NAME} v${CF.VERSION} by ${CF.AUTHOR}${colorMap ? ' — laser-layers mode: one color per group' : ''} -->\n`;
-    s += `<svg xmlns="http://www.w3.org/2000/svg" width="${U.num(D)}mm" height="${U.num(D)}mm" viewBox="${U.num(-half)} ${U.num(-half)} ${U.num(D)} ${U.num(D)}">\n`;
-    if (background === 'white') s += `<rect x="${U.num(-half)}" y="${U.num(-half)}" width="${U.num(D)}" height="${U.num(D)}" fill="#ffffff"/>\n`;
-    s += `<clipPath id="coin"><circle cx="0" cy="0" r="${U.num(half)}"/></clipPath>\n<g clip-path="url(#coin)">\n`;
+    s += `<svg xmlns="http://www.w3.org/2000/svg" width="${U.num(W)}mm" height="${U.num(H)}mm" viewBox="${U.num(-hw)} ${U.num(-hh)} ${U.num(W)} ${U.num(H)}">\n`;
+    if (background === 'white') s += `<rect x="${U.num(-hw)}" y="${U.num(-hh)}" width="${U.num(W)}" height="${U.num(H)}" fill="#ffffff"/>\n`;
+    const clipShape = sub.kind === 'circle'
+      ? `<circle cx="0" cy="0" r="${U.num(hw)}"/>`
+      : `<rect x="${U.num(-hw)}" y="${U.num(-hh)}" width="${U.num(W)}" height="${U.num(H)}"${rx ? ` rx="${U.num(rx)}"` : ''}/>`;
+    s += `<clipPath id="coin">${clipShape}</clipPath>\n<g clip-path="url(#coin)">\n`;
     for (const el of doc.elements) s += CF.Elements.toSVG(el, colorOf(el)) + '\n';
     s += `</g>\n`;
-    if (includeOutline) s += `<circle cx="0" cy="0" r="${U.num(half - 0.05)}" fill="none" stroke="${colorMap ? '#00A0A0' : '#000'}" stroke-width="0.1"/>\n`;
+    if (includeOutline) {
+      const stroke = `fill="none" stroke="${colorMap ? '#00A0A0' : '#000'}" stroke-width="0.1"`;
+      s += sub.kind === 'circle'
+        ? `<circle cx="0" cy="0" r="${U.num(hw - 0.05)}" ${stroke}/>\n`
+        : `<rect x="${U.num(-(hw - 0.05))}" y="${U.num(-(hh - 0.05))}" width="${U.num(W - 0.1)}" height="${U.num(H - 0.1)}"${rx ? ` rx="${U.num(Math.max(0, rx - 0.05))}"` : ''} ${stroke}/>\n`;
+    }
     s += `</svg>`;
     return s;
   }
@@ -211,15 +221,21 @@
         }
         pctx.imageSmoothingEnabled = true;
         pctx.drawImage(cnv, 0, 0, side, side);
-        const px = Math.round(doc.coin.diameterMM * st.dpi / 25.4);
+        const { w: wMM, h: hMM } = CF.substrate.sizeMM(doc);
+        const isRound = CF.substrate.kind(doc) === 'circle';
+        const px = Math.round(wMM * st.dpi / 25.4);
+        const pxH = Math.round(hMM * st.dpi / 25.4);
+        const mmLabel = isRound
+          ? `${U.round(wMM, 2)} mm (${U.round(U.mm2in(wMM), 3)}")`
+          : `${U.round(wMM, 2)} × ${U.round(hMM, 2)} mm`;
         if (st.format === 'png') {
           pxInfo.textContent = st.content === 'pergroup'
-            ? `${buckets.length} file(s), each ${px} × ${px} px at ${st.dpi} DPI — identical framing for perfect alignment`
-            : `Output: ${px} × ${px} px · ${U.round(doc.coin.diameterMM, 2)} mm (${U.round(U.mm2in(doc.coin.diameterMM), 3)}") at ${st.dpi} DPI`;
+            ? `${buckets.length} file(s), each ${px} × ${pxH} px at ${st.dpi} DPI — identical framing for perfect alignment`
+            : `Output: ${px} × ${pxH} px · ${mmLabel} at ${st.dpi} DPI`;
         } else {
           pxInfo.textContent = st.svgMode === 'layers'
             ? `SVG in mm — ${buckets.length} group color(s)${doc.elements.some(e => e.type === 'outline') ? ' + red cut layer' : ''}`
-            : `SVG in millimetres, ${U.round(doc.coin.diameterMM, 2)} mm circle`;
+            : `SVG in millimetres, ${isRound ? `${U.round(wMM, 2)} mm circle` : `${U.round(wMM, 2)} × ${U.round(hMM, 2)} mm`}`;
         }
       }, 60);
 

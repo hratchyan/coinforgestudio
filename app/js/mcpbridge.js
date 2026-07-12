@@ -44,8 +44,9 @@
   function checkFit() {
     const doc = S().doc;
     const warnings = [];
-    const radius = doc.coin.diameterMM / 2;
-    const safe = radius - (doc.coin.marginMM || 2);
+    const sub = CF.substrate.get(doc);
+    const radius = sub.kind === 'circle' ? sub.diameterMM / 2 : Math.min(sub.wMM, sub.hMM) / 2;
+    const safe = radius - (sub.marginMM || 2);
     if (!doc.elements.length) warnings.push('The design is empty.');
     for (const el of doc.elements) {
       if (!el.visible) continue;
@@ -102,7 +103,7 @@
     async new_coin(a) {
       S().newDoc(U.clamp(parseFloat(a.diameter_mm) || 44.45, 5, 300), a.name || 'Untitled Coin');
       CF.renderer.fit();
-      return mutationResult({ diameter_mm: S().doc.coin.diameterMM, name: S().doc.name });
+      return mutationResult({ diameter_mm: S().doc.substrate.diameterMM, name: S().doc.name });
     },
 
     async get_design() {
@@ -177,7 +178,7 @@
       const t = CF.Templates.get(a.id);
       if (!t) return { error: 'unknown template ' + a.id + ' — call list_templates' };
       /* build(diameter) returns a complete doc object, not an element array */
-      const D = S().doc ? S().doc.coin.diameterMM : 44.45;
+      const D = S().doc ? CF.substrate.maxDimMM(S().doc) : 44.45;
       const built = t.build(D);
       S().setDoc(built, { keepProject: true });
       CF.renderer.fit();
@@ -198,7 +199,8 @@
 
     async preview(a) {
       return {
-        json: { coin: S().doc.coin, elements: S().doc.elements.length, warnings: checkFit() },
+        /* `coin` kept for MCP-contract stability (present on circle docs) */
+        json: { coin: S().doc.coin, substrate: S().doc.substrate, material: S().doc.material, elements: S().doc.elements.length, warnings: checkFit() },
         imageB64: previewB64(U.clamp(parseInt(a.size_px) || PREVIEW_PX, 120, 1024), a.metal),
       };
     },
@@ -214,7 +216,7 @@
       const b64 = cnv.toDataURL('image/png').split(',')[1];
       const safeName = (S().doc.name || 'coin').replace(/[^\w\- ]+/g, '').replace(/\s+/g, '-');
       return {
-        json: { dpi, px: cnv.width, mm: S().doc.coin.diameterMM },
+        json: { dpi, px: cnv.width, mm: CF.substrate.sizeMM(S().doc).w },
         fileB64: b64,
         fileName: safeName + '-' + dpi + 'dpi.png',
         imageB64: previewB64(),

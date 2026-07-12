@@ -58,7 +58,7 @@
 
   R.fitBase = function () {
     if (!S().doc) return;
-    const D = S().doc.coin.diameterMM;
+    const D = CF.substrate.maxDimMM(S().doc);
     const avail = Math.min(R.canvas.width, R.canvas.height);
     R.basePx = avail * 0.8 / D;
   };
@@ -86,13 +86,14 @@
 
   /* ---------- art layer ---------- */
   /* renders all elements, ink = grayscale, transparent bg.
-     Returns canvas whose center = doc center; side = D*pad*pxPerMM.
+     Returns canvas whose center = doc center; sides = substrate*pad*pxPerMM.
      filter: optional (el)=>bool (group solo/mute, per-group export). */
   R.renderArt = function (doc, pxPerMM, pad = 1.5, filter) {
-    const D = doc.coin.diameterMM;
-    const side = Math.max(4, Math.round(D * pad * pxPerMM));
-    const { canvas, ctx } = U.makeCanvas(side, side);
-    ctx.translate(side / 2, side / 2);
+    const { w: wMM, h: hMM } = CF.substrate.sizeMM(doc);
+    const sideW = Math.max(4, Math.round(wMM * pad * pxPerMM));
+    const sideH = Math.max(4, Math.round(hMM * pad * pxPerMM));
+    const { canvas, ctx } = U.makeCanvas(sideW, sideH);
+    ctx.translate(sideW / 2, sideH / 2);
     ctx.scale(pxPerMM, pxPerMM);
     for (const el of doc.elements) {
       if (el.type === 'outline') continue; /* machine path, never engraved art */
@@ -200,6 +201,33 @@
     ctx.stroke();
   };
 
+  /* substrate-aware blank dispatcher — circles keep the original drawMetal
+     path untouched; rect/rounded get a flat P0 stub (full treatment in the
+     Cards phase) */
+  R.drawBlank = function (ctx, doc, cx, cy, pxPerMM, metalId) {
+    const sub = CF.substrate.get(doc);
+    if (sub.kind === 'circle') {
+      R.drawMetal(ctx, cx, cy, sub.diameterMM / 2 * pxPerMM, metalId);
+      return;
+    }
+    const m = METALS[metalId] || METALS.brass;
+    const { w, h } = CF.substrate.sizeMM(doc);
+    const wPx = w * pxPerMM, hPx = h * pxPerMM;
+    ctx.save();
+    const g = ctx.createLinearGradient(cx - wPx / 2, cy - hPx / 2, cx + wPx / 2, cy + hPx / 2);
+    g.addColorStop(0, m.hi);
+    g.addColorStop(0.5, m.mid);
+    g.addColorStop(1, m.lo);
+    CF.substrate.trace(ctx, doc, cx, cy, pxPerMM);
+    ctx.fillStyle = g;
+    ctx.fill();
+    CF.substrate.trace(ctx, doc, cx, cy, pxPerMM, { shrink: 0.99 });
+    ctx.lineWidth = Math.max(1, Math.min(wPx, hPx) * 0.012);
+    ctx.strokeStyle = m.rim;
+    ctx.stroke();
+    ctx.restore();
+  };
+
   /* ---------- main render ---------- */
   R.render = function () {
     const doc = S().doc;
@@ -208,7 +236,8 @@
     const W = R.canvas.width, H = R.canvas.height;
     const s = R.scale();
     const { cx, cy } = R.centerPx();
-    const D = doc.coin.diameterMM;
+    const sub = CF.substrate.get(doc);
+    const D = CF.substrate.maxDimMM(doc);
     const rPx = D / 2 * s;
     const ui = S().ui;
 
@@ -221,7 +250,7 @@
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, W, H);
 
-    R.drawMetal(ctx, cx, cy, rPx, ui.metal);
+    R.drawBlank(ctx, doc, cx, cy, s, ui.metal);
 
     /* art */
     const pad = 1.5;
@@ -237,8 +266,12 @@
     ctx.restore();
 
     ctx.save();
-    ctx.beginPath();
-    ctx.arc(cx, cy, rPx * 0.995, 0, Math.PI * 2);
+    if (sub.kind === 'circle') {
+      ctx.beginPath();
+      ctx.arc(cx, cy, rPx * 0.995, 0, Math.PI * 2);
+    } else {
+      CF.substrate.trace(ctx, doc, cx, cy, s, { shrink: 0.995 });
+    }
     ctx.clip();
     if (ui.relief) {
       const d = Math.max(0.6, s * 0.045);
@@ -274,8 +307,13 @@
       ctx.strokeStyle = 'rgba(94,197,255,0.5)';
       ctx.setLineDash([6, 5]);
       ctx.lineWidth = 1;
-      const mr = (D / 2 - doc.coin.marginMM) * s;
-      ctx.beginPath(); ctx.arc(cx, cy, mr, 0, Math.PI * 2); ctx.stroke();
+      if (sub.kind === 'circle') {
+        const mr = (sub.diameterMM / 2 - sub.marginMM) * s;
+        ctx.beginPath(); ctx.arc(cx, cy, mr, 0, Math.PI * 2);
+      } else {
+        CF.substrate.trace(ctx, doc, cx, cy, s, { insetMM: sub.marginMM || 0 });
+      }
+      ctx.stroke();
       ctx.setLineDash([2, 5]);
       ctx.strokeStyle = 'rgba(94,197,255,0.35)';
       ctx.beginPath();
@@ -379,31 +417,43 @@
   /* black-on-transparent art at precise DPI (or on white) */
   R.exportArt = function (doc, dpi, { bg = 'white', invert = false, includeOutline = false, mirror = false, filter = undefined } = {}) {
     const pxPerMM = dpi / 25.4;
-    const D = doc.coin.diameterMM;
-    const side = Math.round(D * pxPerMM);
-    const { canvas, ctx } = U.makeCanvas(side, side);
-    if (bg === 'white') { ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, side, side); }
+    const sub = CF.substrate.get(doc);
+    const { w: wMM, h: hMM } = CF.substrate.sizeMM(doc);
+    const side = Math.round(wMM * pxPerMM);
+    const sideH = Math.round(hMM * pxPerMM);
+    const { canvas, ctx } = U.makeCanvas(side, sideH);
+    if (bg === 'white') { ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, side, sideH); }
     ctx.save();
     if (mirror) { ctx.translate(side, 0); ctx.scale(-1, 1); }
-    /* clip to the coin circle so overflow art doesn't export */
-    ctx.beginPath();
-    ctx.arc(side / 2, side / 2, side / 2, 0, Math.PI * 2);
-    ctx.clip();
+    /* clip to the blank so overflow art doesn't export
+       (rect: the canvas bounds ARE the blank — no clip needed) */
+    if (sub.kind === 'circle') {
+      ctx.beginPath();
+      ctx.arc(side / 2, side / 2, side / 2, 0, Math.PI * 2);
+      ctx.clip();
+    } else if (sub.kind === 'rounded') {
+      CF.substrate.trace(ctx, doc, side / 2, sideH / 2, pxPerMM);
+      ctx.clip();
+    }
     const art = R.renderArt(doc, pxPerMM, 1.0, filter);
-    ctx.drawImage(art, Math.round(side / 2 - art.width / 2), Math.round(side / 2 - art.height / 2));
+    ctx.drawImage(art, Math.round(side / 2 - art.width / 2), Math.round(sideH / 2 - art.height / 2));
     ctx.restore();
     if (includeOutline) {
       ctx.save();
       if (mirror) { ctx.translate(side, 0); ctx.scale(-1, 1); }
-      ctx.beginPath();
-      ctx.arc(side / 2, side / 2, side / 2 - Math.max(1, pxPerMM * 0.05), 0, Math.PI * 2);
+      if (sub.kind === 'circle') {
+        ctx.beginPath();
+        ctx.arc(side / 2, side / 2, side / 2 - Math.max(1, pxPerMM * 0.05), 0, Math.PI * 2);
+      } else {
+        CF.substrate.trace(ctx, doc, side / 2, sideH / 2, pxPerMM, { insetMM: 0.05 });
+      }
       ctx.lineWidth = Math.max(1, pxPerMM * 0.1);
       ctx.strokeStyle = '#000';
       ctx.stroke();
       ctx.restore();
     }
     if (invert) {
-      const img = ctx.getImageData(0, 0, side, side);
+      const img = ctx.getImageData(0, 0, side, sideH);
       const d = img.data;
       for (let i = 0; i < d.length; i += 4) {
         d[i] = 255 - d[i]; d[i + 1] = 255 - d[i + 1]; d[i + 2] = 255 - d[i + 2];
@@ -416,14 +466,24 @@
   R.thumbnail = function (doc, sizePx = 220, metalId) {
     const { canvas, ctx } = U.makeCanvas(sizePx, sizePx);
     const rPx = sizePx * 0.46;
+    const sub = CF.substrate.get(doc);
     ctx.fillStyle = '#1b1e24';
     ctx.fillRect(0, 0, sizePx, sizePx);
-    R.drawMetal(ctx, sizePx / 2, sizePx / 2, rPx, metalId || (CF.store.ui ? CF.store.ui.metal : 'brass'));
-    const pxPerMM = (rPx * 2) / doc.coin.diameterMM;
+    const metal = metalId || (CF.store.ui ? CF.store.ui.metal : 'brass');
+    const pxPerMM = (rPx * 2) / CF.substrate.maxDimMM(doc);
+    if (sub.kind === 'circle') {
+      R.drawMetal(ctx, sizePx / 2, sizePx / 2, rPx, metal);
+    } else {
+      R.drawBlank(ctx, doc, sizePx / 2, sizePx / 2, pxPerMM, metal);
+    }
     const art = R.renderArt(doc, pxPerMM, 1.0);
     ctx.save();
-    ctx.beginPath();
-    ctx.arc(sizePx / 2, sizePx / 2, rPx * 0.99, 0, Math.PI * 2);
+    if (sub.kind === 'circle') {
+      ctx.beginPath();
+      ctx.arc(sizePx / 2, sizePx / 2, rPx * 0.99, 0, Math.PI * 2);
+    } else {
+      CF.substrate.trace(ctx, doc, sizePx / 2, sizePx / 2, pxPerMM, { shrink: 0.99 });
+    }
     ctx.clip();
     ctx.globalAlpha = 0.92;
     ctx.drawImage(art, sizePx / 2 - art.width / 2, sizePx / 2 - art.height / 2);

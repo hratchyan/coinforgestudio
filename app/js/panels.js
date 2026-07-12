@@ -94,7 +94,7 @@
   /* ============ Add tab ============ */
   function buildAdd(pane) {
     pane.innerHTML = '';
-    const R = () => S().doc.coin.diameterMM / 2;
+    const R = () => CF.substrate.maxDimMM(S().doc) / 2;
     const year = String(new Date().getFullYear());
 
     const grid = U.el('div', { class: 'cf-addgrid' });
@@ -159,7 +159,7 @@
         });
         CF.ui.toast('Symbol swapped on selection');
       } else {
-        const R = S().doc.coin.diameterMM / 2;
+        const R = CF.substrate.maxDimMM(S().doc) / 2;
         S().addElement(CF.Elements.create('symbol', Object.assign({ sizeMM: R * 0.5 }, pick)));
       }
     }
@@ -205,7 +205,7 @@
     pane.appendChild(U.el('p', { class: 'cf-hint' }, 'Curated frames sized to your coin. They add editable elements — tweak everything afterwards.'));
     const list = U.el('div', { class: 'cf-cardlist' });
     for (const p of CF.RingPresets.all()) {
-      const D = S().doc ? S().doc.coin.diameterMM : 44.45;
+      const D = S().doc ? CF.substrate.maxDimMM(S().doc) : 44.45;
       const mini = {
         version: 1, coin: { diameterMM: D, marginMM: 2 }, elements: p.build(D / 2)
       };
@@ -230,7 +230,7 @@
     for (const cat of CF.Templates.categories()) {
       list.appendChild(U.el('div', { class: 'cf-subhead' }, cat.label));
       for (const t of cat.items) {
-        const D = S().doc ? S().doc.coin.diameterMM : 44.45;
+        const D = S().doc ? CF.substrate.maxDimMM(S().doc) : 44.45;
         let thumb;
         try { thumb = CF.renderer.thumbnail(t.build(D), 148); }
         catch (e) { console.error('template thumb', t.id, e); thumb = document.createElement('canvas'); }
@@ -249,7 +249,7 @@
               {
                 label: 'Merge on top', onClick: mm => {
                   mm.close();
-                  const built = t.build(S().doc.coin.diameterMM);
+                  const built = t.build(CF.substrate.maxDimMM(S().doc));
                   S().addElements(built.elements);
                   CF.ui.toast('Template merged');
                 }
@@ -257,7 +257,7 @@
               {
                 label: 'Replace design', primary: true, onClick: mm => {
                   mm.close();
-                  const built = t.build(S().doc.coin.diameterMM);
+                  const built = t.build(CF.substrate.maxDimMM(S().doc));
                   const keepName = S().doc.name;
                   built.name = keepName === 'Untitled Coin' ? built.name : keepName;
                   S().setDoc(built, { keepProject: true });

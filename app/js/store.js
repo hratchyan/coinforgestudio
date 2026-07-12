@@ -37,6 +37,7 @@
       groups: [],
       elements: []
     };
+    CF.substrate.norm(S.doc);
     S.sel.clear();
     S.undoStack = [];
     S.redoStack = [];
@@ -51,7 +52,7 @@
 
   S.setDoc = function (doc, { keepProject = false } = {}) {
     S.doc = doc;
-    if (!S.doc.coin) S.doc.coin = { diameterMM: 44.45, marginMM: 2 };
+    CF.substrate.norm(S.doc); /* migrate doc.coin → doc.substrate (+ legacy mirror) */
     if (!Array.isArray(S.doc.groups)) S.doc.groups = []; /* migrate pre-1.1 docs */
     S.ui.soloGroup = null;
     S.ui.mutedGroups = [];
@@ -81,6 +82,7 @@
   S.mutate = function (fn) {
     const pre = currentSnap;
     fn(S.doc);
+    CF.substrate.norm(S.doc);
     const now = JSON.stringify(S.doc);
     if (now !== pre) {
       currentSnap = now;
@@ -94,6 +96,7 @@
   S.emitTransient = function () { CF.bus.emit('doc'); };
   S.endTransient = function () {
     if (transientPre === null) return;
+    CF.substrate.norm(S.doc);
     const now = JSON.stringify(S.doc);
     if (now !== transientPre) {
       currentSnap = now;
