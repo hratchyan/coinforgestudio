@@ -426,7 +426,7 @@
       b.addEventListener('click', fn);
       arr.appendChild(b);
     };
-    mk('⦿ Center', 'Move to coin center', () => S().mutate(d => { const t = d.elements.find(x => x.id === el.id); if (t) { t.x = 0; t.y = 0; } }));
+    mk('⦿ Center', 'Move to blank center', () => S().mutate(d => { const t = d.elements.find(x => x.id === el.id); if (t) { t.x = 0; t.y = 0; } }));
     mk('▲ Front', 'Bring to front', () => S().reorder(el.id, 'top'));
     mk('△ Up', 'Up one', () => S().reorder(el.id, +1));
     mk('▽ Down', 'Down one', () => S().reorder(el.id, -1));
@@ -454,7 +454,7 @@
     root.appendChild(coinSection());
     if (!selSec) {
       root.appendChild(U.el('p', { class: 'cf-hint' },
-        'Nothing selected. Click an element on the coin, or add one from the left panel. Scroll to zoom, drag empty space to pan.'));
+        'Nothing selected. Click an element on the canvas, or add one from the left panel. Scroll to zoom, drag empty space to pan.'));
     }
   }
 

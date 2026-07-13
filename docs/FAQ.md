@@ -20,6 +20,17 @@ radius top and bottom and they'll frame evenly.
 Yes — Symbol Ring → set **Sweep** to e.g. 140° and **Start/center angle** 0. The items
 distribute across the arc.
 
+**Can I make business cards, pet tags or rubber stamps?**
+Yes — **File → New design…** and pick Card, Token or Stamp. Cards are rectangular blanks
+(credit-card, business card, dog tag sizes), tokens are shaped metal (hexagon, shield,
+heart, bone…), and stamps are rubber dies that export mirrored + inverted automatically.
+There are starter templates for each in the Templates tab, plus a QR-code element that
+works on everything — including coins.
+
+**Why can't I add arc text or ring presets to my card?**
+They're circle geometry — they need a round blank (coins and round stamp dies). On cards
+and tokens use the **Frame** element for borders and the align buttons for layout.
+
 **How big should text be?**
 On metal, keep capital height at or above ~1.5 mm (that's the *Size* value for text).
 Thin scripts want more. Engrave a test ring of sizes on a spare blank once — it'll

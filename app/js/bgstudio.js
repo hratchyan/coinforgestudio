@@ -267,7 +267,7 @@
           if (p) CF.ui.toast('Saved ' + p, 3000);
         } else U.download('cutout.png', blob);
       });
-      mkFoot('Send to coin', false, () => { modal.close(); placeResult(); });
+      mkFoot('Send to design', false, () => { modal.close(); placeResult(); });
     } else {
       if (mode === 'place') mkFoot('Place original (skip cleanup)', false, () => {
         mask.fill(1);
@@ -275,7 +275,7 @@
         modal.close();
         placeResult(true);
       });
-      mkFoot(mode === 'element' ? 'Apply to element' : 'Place on coin ▸', true, () => { modal.close(); placeResult(); });
+      mkFoot(mode === 'element' ? 'Apply to element' : 'Place on design ▸', true, () => { modal.close(); placeResult(); });
     }
     modal.root.querySelector('.cf-modal').appendChild(foot);
 

@@ -21,7 +21,14 @@ For 99% of coin work, export **PNG**:
    grayscale) — or bake it here if you prefer exact control of the dot pattern.
 4. **Invert**: only for coated/painted/anodized blanks where the laser *removes* dark
    coating to reveal light metal — your art logic flips.
-5. **Include outline** if you want an alignment circle to frame/position on the blank.
+5. **Include outline** if you want an alignment outline to frame/position on the blank.
+
+**Rubber stamps:** when the design's material is set to *Rubber stamp*, the export dialog
+pre-selects **Invert + Mirror** — the laser burns away the background, leaving your art
+raised and reversed so it prints the right way round. If your laser software has its own
+"stamp mode" (LightBurn does, with shoulder ramps), untick both here and let it do the
+flip instead — never apply the flip twice. Engrave deep (multiple passes) on laserable
+rubber and use strong extraction; rubber fumes are unpleasant.
 
 The PNG's pixel size is exact: a 44.45 mm coin at 1016 DPI = 1778 × 1778 px. **When you
 import it into your laser software, do not rescale it** — set the image size to the same

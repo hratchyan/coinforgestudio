@@ -46,10 +46,10 @@
     const toolsBtn = btn('Tools ▾', 'Utilities', () => {
       CF.ui.menu(toolsBtn, [
         { label: 'Background Remover (standalone)…', hint: 'Ctrl+B', onClick: () => CF.flows.openBgTool() },
-        { label: 'Import image to coin…', onClick: () => CF.flows.addImage() },
+        { label: 'Import image…', onClick: () => CF.flows.addImage() },
         { label: 'Generate Cut Outline…', hint: 'Ctrl+L', onClick: () => CF.outline.openModal() },
         '-',
-        { label: 'Clear all elements', onClick: async () => { if (await CF.ui.confirm('Clear design', 'Remove all elements from the coin?', 'Clear')) S().mutate(d => { d.elements = []; }); } },
+        { label: 'Clear all elements', onClick: async () => { if (await CF.ui.confirm('Clear design', 'Remove all elements from the design?', 'Clear')) S().mutate(d => { d.elements = []; }); } },
       ]);
     });
     g1.appendChild(toolsBtn);

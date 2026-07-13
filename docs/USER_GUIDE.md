@@ -36,20 +36,36 @@ and exporting on the go. For heavy work, the desktop app still rules.
 
 ---
 
-## 2. Coin setup
+## 2. Blank setup (coins, cards, tokens & stamps)
 
-With nothing selected, the right panel shows the **Coin** section:
+**File → New design… (Ctrl+N)** picks the blank:
 
-- **Coin diameter** — enter in mm or inches (dropdown). Common blanks: 1.5" (38.1 mm),
-  1.75" (44.45 mm), 2" (50.8 mm), 40/45/50 mm.
-- **Safe margin** — draws a dashed guide ring. Keep art inside it so nothing falls off the
-  edge bevel of the blank.
+- **● Coin** — round metal blank by diameter.
+- **▭ Card / Tag** — rectangular blanks: credit-card (85.6 × 54 mm CR80), US/EU business
+  cards, dog tag, key fob, or custom width/height/corner radius.
+- **⬡ Token** — shaped metal blanks: hexagon, octagon, oval, shield, heart, dog bone.
+- **◉ Stamp** — rubber stamp dies, rectangular or round. You design it *readable*; the
+  export flips and inverts it automatically so the raised die prints correctly.
+
+With nothing selected, the right panel shows the blank's section (Coin/Card/Token/Stamp):
+
+- **Size** — coins take a diameter (mm or inches); cards and tokens take width/height
+  (cards also a corner radius; tokens a shape picker).
+- **Safe margin** — draws a dashed guide. Keep art inside it so nothing falls off the
+  edge bevel of the blank. (On shaped tokens the guide is approximate near curves.)
+- **Material** — *Metal / hard surface* or *Rubber stamp*. Rubber switches the preview to
+  a die look and sets the stamp export defaults.
 - **Metal preview** — brass, gold, silver, copper, antique bronze, matte black, gunmetal.
   Preview only; it never changes the exported art.
 - **Laser mark appears as** — *Dark marks* for bare metal (steel, brass, titanium
   oxidation marking) or *Light marks* for anodized/coated/painted blanks where the laser
   removes a dark coating. This flips the preview so you can judge contrast correctly.
 - **Relief preview** — adds a subtle emboss illusion so you can judge depth composition.
+
+Ring presets, arc text, symbol rings and ring bands need a **round** blank (coins and
+round stamp dies). On cards and tokens use the **Frame** element for borders, and the
+**Align to blank** buttons (right panel, with a selection) to snap elements to the safe
+margin — left/center/right, top/middle/bottom.
 
 ---
 
@@ -115,6 +131,18 @@ contrast, gamma, levels (black/white point), sharpen, posterize, invert, plus an
 ### Shape
 Parametric shapes: star (any points/inner ratio), sunburst, polygon, ring, gear, cross,
 heart, drop, crescent, bar. Filled or outline.
+
+### QR Code
+A real, scannable QR code generated **entirely offline** — nothing leaves your machine.
+Content can be a URL, phone number, Wi-Fi string or vCard text. Pick an error-correction
+level (**H** is the safest for engraving), keep the **quiet zone** on, and don't go below
+~12 mm on metal if you want phones to scan it reliably. Test-scan an export before
+engraving a batch.
+
+### Frame
+A rectangular border — the card/stamp counterpart to ring bands. Width, height, line
+thickness, corner radius, single or double line. The Add button pre-sizes it to the
+blank's safe margin.
 
 ---
 

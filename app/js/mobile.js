@@ -48,7 +48,7 @@
       return b;
     };
     mk('cf-mb-tools', '☰', 'Tools', () => toggle('left'));
-    mk('cf-mb-canvas', '🪙', 'Coin', () => close());
+    mk('cf-mb-canvas', '🪙', 'Canvas', () => close());
     mk('cf-mb-props', '⚙', 'Properties', () => toggle('right'));
     document.body.appendChild(bar);
 

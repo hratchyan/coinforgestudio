@@ -49,9 +49,10 @@ happy, `export_art` drops a DPI-exact PNG into
 
 ## What the assistant can and can't do
 
-**Can:** start coins, apply ring presets and full templates, add/edit/remove text,
-arc text, symbols, banners and shapes, search the symbol library, render previews,
-check fit, save projects, and export laser-ready PNGs.
+**Can:** start coins, cards, shaped tokens and rubber-stamp dies; apply ring presets
+and full templates (coins, cards, tokens, stamps); add/edit/remove text, arc text,
+symbols, banners, shapes, frames and offline QR codes; search the symbol library;
+render previews; check fit; save projects; and export laser-ready PNGs.
 
 **Can't (on purpose):** touch your files outside the exports folder, spend money,
 change your account, or reach the internet. The server binds to your machine only,

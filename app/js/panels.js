@@ -249,7 +249,7 @@
         'Ring presets need a round blank. Start a coin design (File → New design…) to use them.'));
       return;
     }
-    pane.appendChild(U.el('p', { class: 'cf-hint' }, 'Curated frames sized to your coin. They add editable elements — tweak everything afterwards.'));
+    pane.appendChild(U.el('p', { class: 'cf-hint' }, 'Curated frames sized to your blank. They add editable elements — tweak everything afterwards.'));
     const list = U.el('div', { class: 'cf-cardlist' });
     for (const p of CF.RingPresets.all()) {
       const D = S().doc ? CF.substrate.maxDimMM(S().doc) : 44.45;
@@ -272,7 +272,7 @@
   function buildTemplates(pane) {
     pane.innerHTML = '';
     pane.appendChild(U.el('div', { class: 'cf-pane-title' }, 'Templates'));
-    pane.appendChild(U.el('p', { class: 'cf-hint' }, 'Full starting layouts — coins and cards. Apply replaces the current design (or merges on top).'));
+    pane.appendChild(U.el('p', { class: 'cf-hint' }, 'Full starting layouts — coins, cards, tokens & stamps. Apply replaces the current design (or merges on top).'));
     const list = U.el('div', { class: 'cf-cardlist' });
     for (const cat of CF.Templates.categories()) {
       list.appendChild(U.el('div', { class: 'cf-subhead' }, cat.label));
@@ -306,7 +306,7 @@
                   mm.close();
                   const built = t.build(CF.substrate.maxDimMM(S().doc));
                   const keepName = S().doc.name;
-                  built.name = keepName === 'Untitled Coin' ? built.name : keepName;
+                  built.name = /^Untitled (Coin|Card|Token|Stamp)$/.test(keepName) ? built.name : keepName;
                   S().setDoc(built, { keepProject: true });
                   CF.ui.toast('Template applied');
                 }

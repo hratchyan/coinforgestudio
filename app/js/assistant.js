@@ -20,9 +20,9 @@
     const st = await window.native.mcpStatus();
 
     modal.body.appendChild(U.el('p', { class: 'cf-confirm-msg' },
-      'Let your own Claude design coins in this window — free, no account needed. ' +
+      'Let your own Claude design coins, cards, tokens and stamps in this window — free, no account needed. ' +
       'The assistant runs a private server on this computer only (127.0.0.1). ' +
-      'Point Claude at it and ask for a coin; you\'ll watch it design on your canvas.'));
+      'Point Claude at it and ask for a design; you\'ll watch it work on your canvas.'));
 
     const statusLine = U.el('p', { class: 'cf-ai-status' });
     const btn = U.el('button', { class: 'cf-btn primary' });

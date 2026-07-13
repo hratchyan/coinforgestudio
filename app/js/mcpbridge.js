@@ -53,7 +53,7 @@
       const ext = extentOf(el);
       if (ext > radius + 0.05) {
         /* past the physical coin edge — this WILL be cut off */
-        warnings.push(`"${el.name || el.type}" (id ${el.id}) reaches ~${ext.toFixed(1)}mm from center, past the ${radius.toFixed(1)}mm coin edge — it will be cut off. Shrink it or move it inward.`);
+        warnings.push(`"${el.name || el.type}" (id ${el.id}) reaches ~${ext.toFixed(1)}mm from center, past the ${radius.toFixed(1)}mm blank edge — it will be cut off. Shrink it or move it inward.`);
       } else if (!isEdgeDecor(el) && ext > safe + 0.05) {
         /* text/center art creeping into the rim margin — gentle nudge */
         warnings.push(`"${el.name || el.type}" (id ${el.id}) sits ~${ext.toFixed(1)}mm out, inside the ${safe.toFixed(1)}mm safe margin near the rim. Fine for edge decoration, but pull center art/text in a little for a cleaner look.`);
@@ -104,6 +104,39 @@
       S().newDoc(U.clamp(parseFloat(a.diameter_mm) || 44.45, 5, 300), a.name || 'Untitled Coin');
       CF.renderer.fit();
       return mutationResult({ diameter_mm: S().doc.substrate.diameterMM, name: S().doc.name });
+    },
+
+    async new_card(a) {
+      const wMM = U.clamp(parseFloat(a.width_mm) || 85.6, 10, 300);
+      const hMM = U.clamp(parseFloat(a.height_mm) || 54, 10, 300);
+      const cornerRMM = U.clamp(parseFloat(a.corner_mm) || 0, 0, Math.min(wMM, hMM) / 2);
+      S().newDoc({ kind: cornerRMM > 0 ? 'rounded' : 'rect', wMM, hMM, cornerRMM, marginMM: 4 }, a.name);
+      CF.renderer.fit();
+      return mutationResult({ substrate: S().doc.substrate, name: S().doc.name });
+    },
+
+    async new_token(a) {
+      const shape = CF.substrate.shapeInfo(a.shape) ? a.shape : 'hexagon';
+      const dm = CF.substrate.shapeInfo(shape).defaultMM;
+      const wMM = U.clamp(parseFloat(a.width_mm) || dm[0], 10, 300);
+      const hMM = U.clamp(parseFloat(a.height_mm) || dm[1], 10, 300);
+      S().newDoc({ kind: 'shape', shape, wMM, hMM, marginMM: 3 }, a.name);
+      CF.renderer.fit();
+      return mutationResult({ substrate: S().doc.substrate, name: S().doc.name });
+    },
+
+    async new_stamp(a) {
+      const round = a.round === true || a.round === 'true';
+      if (round) {
+        const d = U.clamp(parseFloat(a.width_mm) || 40, 10, 300);
+        S().newDoc({ kind: 'circle', diameterMM: d, marginMM: 2, material: 'rubber' }, a.name);
+      } else {
+        const wMM = U.clamp(parseFloat(a.width_mm) || 47, 10, 300);
+        const hMM = U.clamp(parseFloat(a.height_mm) || 18, 10, 300);
+        S().newDoc({ kind: 'rect', wMM, hMM, marginMM: 3, material: 'rubber' }, a.name);
+      }
+      CF.renderer.fit();
+      return mutationResult({ substrate: S().doc.substrate, material: S().doc.material, name: S().doc.name });
     },
 
     async get_design() {

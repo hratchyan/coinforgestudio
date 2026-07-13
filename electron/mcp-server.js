@@ -38,6 +38,21 @@ const TOOLS = [
     inputSchema: obj({ diameter_mm: S.num, name: S.str }),
   },
   {
+    name: 'new_card',
+    description: 'Start a rectangular card/tag design (business card, luggage tag). Defaults: credit-card blank 85.6 × 54 mm; corner_mm > 0 rounds the corners (3.18 = CR80 standard). Single-side engraving.',
+    inputSchema: obj({ width_mm: S.num, height_mm: S.num, corner_mm: S.num, name: S.str }),
+  },
+  {
+    name: 'new_token',
+    description: 'Start a shaped metal token. shape: hexagon | octagon | oval | shield | heart | bone (each has a natural default size; width/height stretch it). Ring presets and arc text do NOT apply to shaped blanks.',
+    inputSchema: obj({ shape: S.str, width_mm: S.num, height_mm: S.num, name: S.str }),
+  },
+  {
+    name: 'new_stamp',
+    description: 'Start a rubber stamp die. round=true makes a circular die of width_mm diameter (ring presets + arc text work on round dies); otherwise a width_mm × height_mm rectangle. Design reads normally — the export mirrors and inverts automatically so the raised art prints correctly.',
+    inputSchema: obj({ width_mm: S.num, height_mm: S.num, round: { type: 'boolean' }, name: S.str }),
+  },
+  {
     name: 'get_design',
     description: 'Get the current design as JSON (element image data is elided). Useful to inspect ids and exact properties before updating.',
     inputSchema: obj({}),
@@ -49,7 +64,7 @@ const TOOLS = [
   },
   {
     name: 'list_element_types',
-    description: 'List every element type (text, arctext, symbol, symbolring, ringband, banner, image, shape) with its editable properties, ranges and units — the authoritative parameter reference for add_element/update_element.',
+    description: 'List every element type (text, arctext, symbol, symbolring, ringband, banner, image, shape, qr, frame) with its editable properties, ranges and units — the authoritative parameter reference for add_element/update_element.',
     inputSchema: obj({}),
   },
   {
@@ -79,7 +94,7 @@ const TOOLS = [
   },
   {
     name: 'list_templates',
-    description: 'List the complete coin templates (Veteran Eagle, Police, Fire, Wedding…).',
+    description: 'List the complete design templates — coins (Veteran Eagle, Police, Fire, Wedding…), cards (contact, QR business card, pet tag), tokens (hex, shield, heart, bone) and rubber stamps (address, round seal, RECEIVED).',
     inputSchema: obj({}),
   },
   {
@@ -123,10 +138,26 @@ const TOOLS = [
 const DESIGN_GUIDE = `# CoinForge design guide (for AI assistants)
 
 ## Coordinate system
-- Units are millimetres. Origin = coin center. x → right, y → down.
+- Units are millimetres. Origin = blank center. x → right, y → down.
 - Angles in degrees, 0° = 12 o'clock, clockwise.
-- The coin is a circle of diameter \`coin.diameterMM\` with a safe margin
-  \`coin.marginMM\` (default 2mm) — keep art inside radius − margin.
+- The blank is described by \`doc.substrate\`: a circle (\`diameterMM\`), a
+  rect/rounded card (\`wMM\`/\`hMM\`/\`cornerRMM\`), or a shaped token
+  (\`shape\` + \`wMM\`/\`hMM\`). Every substrate has a safe margin
+  \`marginMM\` — keep art inside the blank minus the margin.
+- Circle docs also carry a legacy \`coin\` object (same values) for
+  compatibility; prefer \`substrate\`.
+
+## Substrates & materials (start with the right tool)
+- new_coin → round metal coin. new_card → rect/rounded card or tag.
+  new_token → shaped blank (hexagon/octagon/oval/shield/heart/bone).
+  new_stamp → rubber stamp die (round or rect; \`doc.material = 'rubber'\`).
+- Round-only tools (ring presets, arctext, symbolring, ringband) work on
+  ANY circle blank — coins and round stamp dies — but not on cards/tokens.
+  For rect borders use the \`frame\` element instead.
+- Rubber stamps: design normally (readable). Export mirrors + inverts
+  automatically so the raised die prints correctly.
+- The \`qr\` element generates offline QR codes (URL/phone/vCard) on any
+  substrate — keep the quiet zone on and prefer EC level H for engraving.
 
 ## Shade (there is no color)
 - Fiber lasers mark metal darker or leave it bare. \`shade\` 0 = full dark mark,
@@ -144,9 +175,9 @@ const DESIGN_GUIDE = `# CoinForge design guide (for AI assistants)
   preview and check_fit after every couple of changes.
 
 ## Recommended workflow
-1. new_coin (or apply_template, then personalize)
-2. apply_ring_preset for the frame
-3. add_element arctext (top), arctext (bottom), symbol/banner/text center
+1. new_coin / new_card / new_token / new_stamp (or apply_template, then personalize)
+2. coins & round dies: apply_ring_preset for the frame · cards/rect stamps: add a frame element
+3. add_element arctext/text/symbol/banner/qr as fits the blank
 4. preview → adjust sizes/radii with update_element → check_fit
 5. save_project + export_art
 

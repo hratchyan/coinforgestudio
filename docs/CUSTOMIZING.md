@@ -92,6 +92,19 @@ template works on any blank diameter.
 },
 ```
 
+Cards, tokens and stamps have their own helpers — these carry a fixed real-world
+substrate instead of scaling with `D`:
+
+```js
+cardDoc('My Card', 85.6, 54, 3.18, [...elements]);        // w, h, corner radius (mm)
+tokenDoc('My Token', 'shield', 45, 55, [...elements]);    // shape id, w, h
+stampDoc('My Stamp', { kind: 'rect', wMM: 47, hMM: 18, marginMM: 3 }, [...elements]);
+```
+
+Token shape ids live in `app/js/substrate.js` (`SHAPES`: hexagon, octagon, oval, shield,
+heart, bone) — each defines the blank outline once for both the canvas preview and the
+SVG export clip. New categories (`cat:`) appear in the Templates tab automatically.
+
 ---
 
 ## Add glyphs

@@ -280,7 +280,7 @@
       { key: 'centerDeg', label: 'Center angle', kind: 'number', min: -360, max: 360, step: 1, unit: '°' },
       { key: 'letterSpacing', label: 'Letter spacing', kind: 'number', min: -2, max: 10, step: 0.1, unit: 'mm' },
       { key: 'sweepDeg', label: 'Spread over arc (0 = natural)', kind: 'number', min: 0, max: 360, step: 5, unit: '°' },
-      { key: 'lockCenter', label: 'Lock to coin center', kind: 'checkbox' },
+      { key: 'lockCenter', label: 'Lock to blank center', kind: 'checkbox' },
     ]
   };
 
@@ -349,7 +349,7 @@
       { key: 'sweepDeg', label: 'Sweep', kind: 'number', min: 10, max: 360, step: 5, unit: '°' },
       { key: 'rotateItems', label: 'Rotate with ring', kind: 'checkbox' },
       { key: 'itemRotDeg', label: 'Item rotation', kind: 'number', min: -180, max: 180, step: 5, unit: '°' },
-      { key: 'lockCenter', label: 'Lock to coin center', kind: 'checkbox' },
+      { key: 'lockCenter', label: 'Lock to blank center', kind: 'checkbox' },
     ]
   };
 
@@ -432,7 +432,7 @@
       { key: 'radiusMM', label: 'Radius (centerline)', kind: 'number', min: 1, max: 80, step: 0.25, unit: 'mm' },
       { key: 'thicknessMM', label: 'Thickness', kind: 'number', min: 0.2, max: 20, step: 0.1, unit: 'mm' },
       { key: 'detail', label: 'Pattern density', kind: 'number', min: 0.3, max: 3, step: 0.1 },
-      { key: 'lockCenter', label: 'Lock to coin center', kind: 'checkbox' },
+      { key: 'lockCenter', label: 'Lock to blank center', kind: 'checkbox' },
     ]
   };
 

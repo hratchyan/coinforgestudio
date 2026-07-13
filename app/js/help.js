@@ -119,7 +119,7 @@
             U.el('img', { class: 'cf-about-logo', src: 'favicon.png', alt: '' }),
             U.el('h2', null, CF.APP_NAME),
             U.el('p', null, `Version ${CF.VERSION}`),
-            U.el('p', null, 'A coin & challenge-coin designer for laser engraving.'),
+            U.el('p', null, 'A challenge-coin, card, token & stamp designer for laser engraving.'),
             U.el('p', null, U.el('strong', null, `Author: ${CF.AUTHOR}`)),
             U.el('p', { class: 'cf-hint' }, 'MIT License · Fonts: Google Fonts (OFL) · AI model: U²-Net (Apache-2.0) · Runtime: onnxruntime-web (MIT)')));
         }
