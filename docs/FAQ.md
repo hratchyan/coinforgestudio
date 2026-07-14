@@ -99,8 +99,10 @@ See `CUSTOMIZING.md` — that's the whole point of the plain-JS design.
 
 **What's free, and what's paid?**
 Almost everything is free — every design tool, every export, the AI assistant, and
-**1 cloud project** — forever, no watermarks. **Pro** ($59/year) adds just two things:
-**10 cloud slots** (up from 1) and the **template & asset vault**.
+**1 cloud project** — forever, no watermarks. **Pro** ($59/year) adds **10 cloud slots**
+(up from 1) today, plus the **Pro production toolkit** — batch personalization from a
+spreadsheet, serial-number runs, laser-bed sheet nesting — which is in development and
+included with Pro as it ships.
 
 **Where do my projects live?**
 - *Desktop app:* real `.coin` files in `Documents\CoinForge Projects`. Yours, offline, forever.
@@ -127,6 +129,7 @@ no account needed. Your AI subscription, your machine, your data. See the AI Ass
 guide for setup.
 
 **Does the free version get worse over time?**
-No. The promise is structural: the two paid things are *around* the designer (extra cloud
-storage and content packs) — never the designer, the export quality, or the AI. If a tool
-exists in CoinForge, it works in Free.
+No. The promise is structural: the paid things sit *around* the designer — extra cloud
+capacity and volume-production tooling for people running orders — never the designer
+itself, the export quality, or the AI. Designing and exporting any single piece is free,
+forever.

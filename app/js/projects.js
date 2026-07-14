@@ -456,7 +456,7 @@
             U.el('div', { class: 'cf-slot cf-slot-locked' }, '🔒')),
           U.el('div', { class: 'cf-cloudtease-txt' },
             U.el('b', null, 'Projects that follow your account.'),
-            ' Cloud slots sync your coins to any device you sign in on. Pro includes 10 slots — plus the full template & asset vault.',
+            ' Cloud slots sync your coins to any device you sign in on. Pro includes 10 slots — and the production toolkit as it ships.',
             U.el('a', { href: C.plansURL, target: '_blank', rel: 'noopener', class: 'cf-cloudtease-link' }, 'See plans →')));
         const link = tease.querySelector('.cf-cloudtease-link');
         link.addEventListener('click', (e) => {
@@ -530,12 +530,12 @@
       }
       cloudWrap.appendChild(grid);
 
-      /* free tier: gentle upsell for the other 9 slots + the vault */
+      /* free tier: gentle upsell for the other 9 slots + the toolkit */
       if (tier === 'free' && CF.billing) {
         const up = U.el('div', { class: 'cf-cloudtease', style: { marginTop: '10px' } },
           U.el('div', { class: 'cf-cloudtease-txt' },
             'Using your ', U.el('b', null, '1 free cloud slot'),
-            '. Pro unlocks ', U.el('b', null, '10 slots'), ' and the full template & asset vault — ',
+            '. Pro unlocks ', U.el('b', null, '10 slots'), ' and the Pro production toolkit — ',
             U.el('a', { href: C.plansURL, rel: 'noopener', class: 'cf-cloudtease-link' }, 'go Pro →')));
         up.querySelector('.cf-cloudtease-link').addEventListener('click', (e) => {
           e.preventDefault(); modal.close(); CF.billing.upgradeDialog();
@@ -616,7 +616,7 @@
     const bar = U.el('div', { id: 'cf-storebanner' },
       U.el('span', { class: 'cf-storebanner-txt' },
         '💾 Free plan: ', U.el('b', null, '1 cloud slot'),
-        ' + unlimited local saves (this device). Pro unlocks 10 cloud slots and the template vault.'),
+        ' + unlimited local saves (this device). Pro unlocks 10 cloud slots and the production toolkit.'),
       U.el('button', { class: 'cf-storebanner-btn' }, 'Export backup'),
       U.el('a', { class: 'cf-storebanner-link', href: CF.cloud ? CF.cloud.plansURL : '#', target: '_blank', rel: 'noopener' }, 'See plans'),
       U.el('button', { class: 'cf-storebanner-x', title: 'Dismiss' }, '×'));

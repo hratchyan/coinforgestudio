@@ -16,7 +16,7 @@ every time.
 
 | Way | How | Notes |
 | --- | --- | --- |
-| **In your browser** | [app.coinforgestudio.com](https://app.coinforgestudio.com) | Nothing to install; free account (Google sign-in) includes 1 cloud project. Optional [Pro plan](https://coinforgestudio.com/#pricing) adds 10 cloud slots & the template vault |
+| **In your browser** | [app.coinforgestudio.com](https://app.coinforgestudio.com) | Nothing to install; free account (Google sign-in) includes 1 cloud project. Optional [Pro plan](https://coinforgestudio.com/#pricing) adds 10 cloud slots & the production toolkit (in development) |
 | **Windows portable** ⭐ | Grab `CoinForgeStudio-Portable.exe` from [Releases](https://github.com/hratchyan/coinforgestudio/releases) | No install, no account, works fully offline — copy it anywhere |
 | **Windows installer** | `CoinForgeStudio-Setup.exe` from [Releases](https://github.com/hratchyan/coinforgestudio/releases) | Start-menu & desktop shortcuts |
 | **From source** | Clone, then `Launch CoinForge (Browser Mode).bat` | Runs the raw files in Edge/Chrome; zero dependencies |

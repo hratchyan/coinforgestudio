@@ -17,9 +17,12 @@ A coin & challenge-coin designer for laser engraving. Live product:
 ## Product model (current)
 - **Free:** full designer (web + desktop), unlimited local saves, the **AI Assistant
   (MCP) — free**, and **1 cloud project**.
-- **Pro** ($59/yr, $39 first year via EARLYBIRD promo): **10 cloud slots + the template
-  & asset vault.** That's the entire paid value. Lapse = cloud slots read-only, never deleted.
-- The designer, every export, and the AI are free forever. Paid = cloud capacity + content.
+- **Pro** ($59/yr, $39 first year via EARLYBIRD promo): **10 cloud slots + the Pro
+  production toolkit** (batch personalization, serial runs, sheet nesting — in development
+  for v1.8 as a privately-licensed module served on entitlement; the vault idea was
+  dropped 2026-07-12, see the journal). Lapse = cloud slots read-only, never deleted.
+- The designer, every export, and the AI are free forever. Paid = cloud capacity +
+  volume production. Single-piece design/export is never gated.
 
 ## Architecture & conventions (do not fight these)
 - **Pure vanilla HTML/JS/CSS in `app/`. No build step. Classic scripts. Global `CF`
